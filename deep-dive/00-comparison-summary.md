@@ -1,7 +1,7 @@
-# Agentic RL 四篇核心工作横向对比
+# Agentic RL 代表性工作横向对比
 
 **Date**: 2026-03-02  
-**Purpose**: 系统性对比Tongyi DeepResearch、GLM-5、ABE、GEM四篇工作
+**Purpose**: 系统性对比Tongyi DeepResearch、GLM-5、ABE、GEM等代表性工作
 
 ---
 

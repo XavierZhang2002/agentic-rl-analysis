@@ -8,7 +8,7 @@
 - **arXiv**: 2210.03629
 - **Contribution**: 提出Reasoning + Acting的循环范式
 - **Significance**: 所有后续Agentic RL工作的基础
-- **Relation**: 四篇工作都在ReAct的基础上进行改进
+- **Relation**: 后续工作都在ReAct的基础上进行改进
 
 ### 2. Reflexion: Self-Reflective Agents
 - **Authors**: Shinn et al.
@@ -30,7 +30,7 @@
 - **Type**: 开源项目
 - **Contribution**: 实际可运行的Agent系统
 - **Significance**: 验证了Agentic RL技术的可行性
-- **Relation**: 可作为四篇工作的测试平台
+- **Relation**: 可作为代表性工作的测试平台
 
 ### 5. Claude Code / Copilot等商业产品
 - **Type**: 商业应用
@@ -44,19 +44,19 @@
 - **Papers**: InstructGPT, ChatGPT, Claude等
 - **Contribution**: 人类反馈强化学习
 - **Significance**: Agentic RL的基础训练方法
-- **Relation**: 四篇工作都基于RLHF进行扩展
+- **Relation**: 代表性工作都基于RLHF进行扩展
 
 ### 7. Tool Learning Survey
 - **Type**: 综述文章
 - **Contribution**: 系统性总结Tool Learning进展
 - **Significance**: 提供领域全景
-- **Relation**: 可作为阅读四篇工作的前置知识
+- **Relation**: 可作为阅读代表性工作的前置知识
 
 ### 8. WebArena / OSWorld等评测环境
 - **Type**: 评测基准
 - **Contribution**: 标准化的Agent评测
 - **Significance**: 让不同方法可比较
-- **Relation**: ABE的自动化环境构建可用于生成此类评测环境
+- **Relation**: 自动化环境构建方法可用于生成此类评测环境
 
 ## 值得关注的方向
 
@@ -78,14 +78,14 @@
 ### 方向4：安全与对齐
 - **Papers**: Safe tool use, aligned agents
 - **Importance**: Agentic RL必须考虑安全性
-- **Gap**: 四篇工作对此涉及较少
+- **Gap**: 当前研究对此涉及较少
 
 ## 推荐阅读顺序
 
 ### 入门级
 1. ReAct (基础概念)
 2. Tool Learning Survey (领域概览)
-3. 本仓库的四篇deep-dive分析
+3. 本仓库的代表性工作深度分析
 
 ### 进阶级
 1. Tongyi DeepResearch (训练框架)
@@ -94,7 +94,7 @@
 4. GEM (数据合成)
 
 ### 专家级
-1. 对比四篇工作的异同
+1. 对比代表性工作的异同
 2. 思考如何组合使用
 3. 探索新的研究方向
 

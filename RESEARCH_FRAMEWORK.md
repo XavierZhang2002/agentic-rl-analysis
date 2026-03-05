@@ -2,7 +2,7 @@
 
 ## 研究范围扩展
 
-除了已分析的四篇工作（Tongyi, GLM-5, ABE, GEM），Agentic RL还包括以下重要方向：
+Agentic RL研究包含以下重要方向：
 
 ---
 
