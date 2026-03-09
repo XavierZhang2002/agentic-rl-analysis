@@ -45,13 +45,15 @@
 
 ---
 
-### 📚 [papers/all-papers.md](papers/all-papers.md)
-**15篇核心论文详细总结**（原始数据）
+### 📚 [PAPERS_LIST.md](PAPERS_LIST.md)
+**47篇论文完整列表**（所有调研论文）
 
-每篇论文包含：
-- 基本信息（标题、作者、机构、GitHub）
-- 核心问题与方法
-- 实验结果与关键洞察
+包含：
+- 标题、arXiv ID、机构、会议
+- 内容概括（1句话总结）
+- 按类别分类：GRPO家族、PPO/DPO、2026 Q1、应用等
+- 时间分布、机构统计、开源情况
+- 关键术语索引
 
 ---
 
@@ -62,13 +64,11 @@ agentic-rl-analysis/
 ├── README.md                              # 【本文件】项目导航
 ├── CORE_CHALLENGES_DEEP_REPORT.md         # 【主报告】核心挑战深度分析（34篇论文）
 ├── INFLUENCE_ASSESSMENT.md                # 【影响力】开源/机构/趋势评估
-├── papers/
-│   ├── all-papers.md                      # 15篇论文详细总结（原始数据）
-│   └── full-text/                         # 15篇PDF全文（124MB）
+├── PAPERS_LIST.md                         # 【论文列表】47篇论文完整索引
 └── LICENSE                                # MIT许可证
 ```
 
-**极简设计，3个核心md + 1个数据文件夹**
+**极简设计，仅4个核心文件**
 
 ---
 
@@ -88,7 +88,7 @@ agentic-rl-analysis/
 ### 路径3：全面掌握（1-2小时）
 1. 主报告
 2. **INFLUENCE_ASSESSMENT.md**（了解影响力和工业应用）
-3. **papers/all-papers.md**（深入特定论文）
+3. **PAPERS_LIST.md**（查找特定论文，47篇完整索引）
 
 ---
 
