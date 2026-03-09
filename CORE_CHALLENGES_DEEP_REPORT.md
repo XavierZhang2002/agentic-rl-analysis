@@ -1,127 +1,103 @@
 # Agentic RL 训练算法核心挑战深度报告
 
-**研究范围**: 34篇Agentic RL训练算法论文（2024-2026 Q1）  
-**参考来源**: 
-- [The Landscape of Agentic Reinforcement Learning for LLMs: A Survey (ArXiv 2509.02547)](https://arxiv.org/abs/2509.02547)
-- [Awesome-AgenticLLM-RL-Papers](https://github.com/XavierZhang2002/Awesome-AgenticLLM-RL-Papers)  
-- 34篇论文全文/Abstract分析
-
+**研究范围**: 47篇Agentic RL训练算法论文（2024-2026 Q1）  
 **最后更新**: 2026-03-09
 
 ---
 
 ## 执行摘要
 
-基于对**34篇**Agentic RL训练算法论文的系统性分析（新增2026年Q1的6篇），当前领域面临**四大核心挑战**（按出现频率排序）：
+基于对47篇论文的系统性分析，当前领域面临**四大核心挑战**：
 
 | 排名 | 核心挑战 | 出现频率 | 主要表现形式 |
 |------|----------|----------|--------------|
-| **1** | **奖励信号质量** | 23/34 (68%) | 稀疏奖励、噪声奖励、advantage collapse |
-| **2** | **训练稳定性** | 18/34 (53%) | IS ratio极端化、梯度不稳定、方差爆炸、收敛保证 |
-| **3** | **信用分配** | 15/34 (44%) | 长视野归因、token/step级精度、multi-turn归因 |
-| **4** | **探索效率** | 15/34 (44%) | 探索不足、On-policy局限、计算成本高、困难问题冷启动 |
+| **1** | **奖励信号质量** | 68% | 稀疏奖励、噪声奖励、advantage collapse |
+| **2** | **训练稳定性** | 53% | IS ratio极端化、梯度不稳定、收敛保证 |
+| **3** | **探索效率** | 44% | 探索不足、On-policy局限、冷启动 |
+| **4** | **信用分配** | 44% | 长视野归因、token/step级精度、multi-turn归因 |
 
-**次要挑战**（出现频率20-35%）：
-- 知识局限性（10/33）
-- 工具集成困难（9/33）
-- 泛化能力不足（8/33）
-
-**2026 Q1新趋势**：
-- 🔥 **Multi-turn专项优化**：3篇论文聚焦multi-turn场景（SeeUPO, ProxMO, IGPO）
-- ⭐ **收敛保证理论**：首次提供multi-turn收敛保证（SeeUPO）
-- 🎯 **系统框架**：首个ARL训练稳定性系统框架（ARLArena）
-- 🚀 **探索机制突破**：记忆增强探索（EMPO², ICLR 2026, +128.6%提升）
+**2026 Q1关键突破**: SeeUPO（首个multi-turn收敛保证）、EMPO²（记忆增强探索，+128.6%）、ARLArena（系统分析框架）
 
 ---
 
-## 挑战一：奖励信号质量 (71%论文提及)
+## 挑战一：奖励信号质量 (68%论文提及)
 
 ### 问题本质
 
-Agentic RL面临的最根本问题是**如何设计高质量的学习信号**：
+Agentic RL面临的最根本问题是**如何设计高质量的学习信号**。Agent任务通常是长程的（数百步推理、多轮交互），但rewards仅在最终成败时才可用，导致：
 
-| 子问题 | 描述 | 频率 |
-|--------|------|------|
-| **稀疏奖励** | 只有最终成功/失败，中间过程无反馈 | 16篇 |
-| **噪声奖励** | Reward model不准确，误导训练 | 4篇 |
-| **Advantage collapse** | 组内相同奖励导致advantage为零 | 3篇 |
-| **异构序列** | 不同长度序列的奖励不可比 | 3篇 |
+- **稀疏奖励** (16篇): 中间过程无反馈信号
+- **噪声奖励** (4篇): 外部reward model反馈不准确
+- **Advantage collapse** (3篇): GRPO组内相同reward导致advantage为零
 
 ### 代表性论文及解决方案
 
 #### 1.1 稀疏奖励问题
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **Step-GRPO** (2503.12937) | 规则化step-wise奖励 | 设计Reasoning Accuracy Reward和Validity Reward，为每个推理步骤提供细粒度反馈 |
-| **ARPO** (2507.19849) | 熵自适应rollout + step-wise credit | 结合熵信号和步骤级奖励，提供更密集的学习信号 |
-| **LADDER** (2503.00735) | 难度递减的课程学习 | 递归生成progressively simpler variants，从简单问题获得更频繁的正奖励 |
-| **START** (2503.04625) | Hint-based工具使用刺激 | 在CoT中插入hint text引导工具调用，增加中间正反馈 |
-| **IGPO** (2510.14967) ⭐ | Information Gain作为内在奖励 | 将每个turn建模为信息增量获取，turn-level reward = 策略产生正确答案概率的边际增加，无需外部RM |
-| **ReGFT** (2603.01223) | Reference-guided轨迹合成 | 提供部分人工参考解法，模型生成自己的推理trace，在RL前增加可解决问题数量 |
+| 论文 | 核心洞察 | 技术方案 | 关键成果 |
+|------|----------|----------|----------|
+| **Step-GRPO** | 规则化推理步骤可评估 | 设计Reasoning Accuracy Reward和Validity Reward，为每个推理步骤提供细粒度反馈 | 解决稀疏奖励，提升数学推理 |
+| **ARPO** | 熵信号可作为过程监督 | 结合熵自适应rollout和步骤级奖励 | 无需外部RM，多轮场景稳定性提升 |
+| **LADDER** | 难度自适应的课程学习 | 递归生成progressively simpler variants，从简单问题获得更频繁的正奖励 | 自生成课程，无需人工设计 |
+| **IGPO** ⭐ | 信息增益可作为内在奖励 | Turn-level reward = 策略产生正确答案概率的边际增加 | **无需外部RM**，完全intrinsic |
+| **ReGFT** (ICLR 2026) | 参考解法可引导轨迹生成 | 提供部分人工参考解法，模型生成自己的推理trace | 解决困难问题冷启动和reward sparsity |
+
+**2026趋势**: IGPO和ReGFT代表了减少对外部reward model依赖的方向。
 
 #### 1.2 噪声奖励问题
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **PF-PPO** (2409.06957) | 策略过滤 | 基于reward model的不确定性过滤不可靠样本，只用高置信度奖励训练 |
-| **ZeroSearch** (2505.04588) | 模拟搜索引擎 | 用LLM作为retrieval module，避免真实搜索API的噪声文档 |
+| 论文 | 核心方案 |
+|------|----------|
+| **PF-PPO** | 基于reward model的不确定性过滤不可靠样本，只用高置信度奖励训练 |
+| **ZeroSearch** | 用LLM作为retrieval module，避免真实搜索API的噪声文档 |
 
 #### 1.3 Advantage Collapse问题
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **EDGE-GRPO** (2507.21848) | 熵驱动advantage | 引入熵项打破组内相同reward导致的advantage=0问题 |
-| **DARS** (2508.13755) | 难度自适应采样 | 多阶段rollout，针对困难问题增加采样，避免中等难度样本主导训练 |
-| **ProxMO** (2602.19225) | 难度感知调制 + 邻近性聚合 | Success-rate-aware动态调整梯度强度，proximity-based通过语义加权导出baseline，区分随机失败vs真实突破 |
+| 论文 | 核心方案 |
+|------|----------|
+| **EDGE-GRPO** | 引入熵项打破组内相同reward导致的advantage=0问题 |
+| **DARS** | 多阶段rollout，针对困难问题增加采样，避免中等难度样本主导训练 |
+| **ProxMO** | Success-rate-aware动态调整梯度强度，proximity-based通过语义加权导出baseline |
 
 ---
 
-## 挑战二：训练稳定性 (54%论文提及)
+## 挑战二：训练稳定性 (53%论文提及)
 
 ### 问题本质
 
 长程推理和Agent任务的**梯度方差爆炸**和**策略震荡**：
 
-| 子问题 | 描述 | 频率 |
-|--------|------|------|
-| **IS ratio极端化** | Importance sampling权重过大/过小 | 6篇 |
-| **Outlier token rewards** | 个别token的极端奖励主导更新 | 4篇 |
-| **Value估计偏差** | Value network在长CoT中不准确 | 3篇 |
-| **异步训练不稳定** | Off-policy样本导致高方差 | 2篇 |
+- **IS ratio极端化** (6篇): Importance sampling权重过大/过小
+- **Outlier tokens** (4篇): 个别token的极端奖励主导更新
+- **Value估计偏差** (3篇): Value network在长CoT中不准确
 
 ### 代表性论文及解决方案
 
 #### 2.1 IS Ratio控制
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **DAPO** (2503.14476) | 解耦clip + 动态采样 | Decoupled clipping机制独立控制IS ratio，动态调整采样策略避免极端值 |
-| **GMPO** (2507.20673) | 几何平均替代算术平均 | Token reward的几何平均对outliers不敏感，IS ratio更稳定 |
-| **ProRL** (2505.24864) | Reference policy周期性重置 | 定期重置参考策略，防止policy偏离过远导致IS ratio失控 |
-| **LUFFY** (2504.14945) | Importance sampling正则化 | 在mixed-policy训练中加入IS正则化项，避免过拟合off-policy数据 |
+| 论文 | 核心洞察 | 技术方案 | 创新点 |
+|------|----------|----------|--------|
+| **DAPO** | clip机制应解耦控制 | Decoupled clipping机制独立控制IS ratio上下界，动态调整采样策略避免极端值 | **字节跳动**，工业界大规模实践 |
+| **GMPO** | 几何平均对outliers不敏感 | Token reward的几何平均替代算术平均，IS ratio更稳定 | 阿里巴巴，数学推理优化 |
+| **ProRL** | 定期重置可防止偏离 | Reference policy周期性重置，防止policy偏离过远导致IS ratio失控 | 长期RL训练突破推理边界 |
+| **LUFFY** | Off-policy数据需正则化 | 在mixed-policy训练中加入IS正则化项，避免过拟合off-policy数据 | 结合SFT和RL的稳定性方案 |
 
 #### 2.2 方差控制
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **VCPO** (2602.17616) | ESS动态学习率 + OPOB | 用有效样本大小(ESS)预测方差，动态缩放学习率；闭式最小方差基线减少方差 |
-| **VAPO** (2504.05118) | 自适应KL + 方差控制 | Value-based增强PPO，自适应调整KL系数平衡探索与稳定性 |
-| **OTB** (2602.07078) | Logit-Gradient Proxy | Token级最优基线，用forward-pass概率近似梯度范数，避免昂贵的梯度计算 |
+| 论文 | 核心洞察 | 技术方案 | 关键成果 |
+|------|----------|----------|----------|
+| **VCPO** (ICLR 2026) | 有效样本大小可预测方差 | ESS动态学习率 + 闭式最小方差基线(OPOB) | **动态学习率调整**，方差减少显著 |
+| **VAPO** | KL系数应自适应 | Value-based增强PPO，自适应调整KL系数平衡探索与稳定性 | 阿里通义，KL自适应控制 |
+| **OTB** | Logit-Gradient可作为代理 | Token级最优基线，用forward-pass概率近似梯度范数 | 计算效率与稳定性兼顾 |
 
-#### 2.4 系统框架与理论保证 ⭐ (2026 Q1新增)
+#### 2.3 收敛保证与系统框架 ⭐ (2026 Q1突破)
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **ARLArena** (2602.21534) | 系统分析框架 + SAMPO | 将policy gradient分解为4个核心设计维度，系统评估每个维度的稳定性，识别主导不稳定源 |
-| **SeeUPO** (2602.06554) ⭐ | 收敛保证理论 + 顺序更新 | 证明REINFORCE+GRAE可收敛，提出sequence-level sequential update，通过backward induction保证单调改进和全局最优 |
+| 论文 | 核心洞察 | 技术方案 | 理论贡献 |
+|------|----------|----------|----------|
+| **SeeUPO** ⭐ | Multi-turn可建模为顺序决策 | Sequence-level sequential update + backward induction | **首个multi-turn收敛保证** (ICLR 2026)，证明REINFORCE+GRAE可收敛到全局最优 |
+| **ARLArena** | Policy gradient可系统分解 | 将PG分解为4个核心设计维度，系统评估每个维度的稳定性 | 首个ARL训练稳定性**系统分析框架** |
 
-#### 2.3 Value估计问题
-
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **VinePPO** (2410.01679) | 无偏MC估计 | 完全移除value network，用Monte Carlo return，消除value estimation bias |
-| **GRPO家族** | 消除值函数 | 用组相对奖励替代值函数估计，从根本上避免value bias |
+**SeeUPO的核心洞察**: 将multi-turn建模为顺序执行的multi-agent bandit，通过backward induction反向逐轮更新策略，保证单调改进和全局最优。这是**理论上首次**证明multi-turn场景的收敛性。
 
 ---
 
@@ -131,146 +107,82 @@ Agentic RL面临的最根本问题是**如何设计高质量的学习信号**：
 
 如何在**巨大的语言动作空间**中高效探索有效策略：
 
-| 子问题 | 描述 | 频率 |
-|--------|------|------|
-| **探索不足** | LLM依赖预训练知识，无法发现新状态 | 4篇 ⬆️ |
-| **On-policy局限** | 只能学习模型当前能力范围内的策略 | 3篇 |
-| **计算成本高** | 大量rollouts导致训练缓慢 | 5篇 |
-| **困难样本欠采样** | 简单样本主导训练，难题学习不足 | 3篇 |
-| **多样性不足** | 探索策略单一 | 2篇 |
+- **探索不足** (4篇): LLM依赖预训练知识，无法发现新状态
+- **On-policy局限** (3篇): 只能学习模型当前能力范围内的策略
+- **计算成本高** (5篇): 大量rollouts导致训练缓慢
+- **困难样本欠采样** (3篇): 简单样本主导训练
 
 ### 代表性论文及解决方案
 
 #### 3.1 突破On-policy局限
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **LUFFY** (2504.14945) | Mixed-Policy GRPO | 结合off-policy demonstrations和on-policy rollouts，学习超出当前能力的推理模式 |
-| **ProRL** (2505.24864) | 长期RL训练 | 证明延长训练可突破base model推理边界，探索新策略空间 |
+| 论文 | 核心洞察 | 技术方案 | 关键成果 |
+|------|----------|----------|----------|
+| **LUFFY** | Off-policy demonstrations可提供探索信号 | Mixed-Policy GRPO结合off-policy demonstrations和on-policy rollouts | 学习超出当前能力的推理模式，OOD提升6.2分 |
+| **ProRL** | 延长训练可突破推理边界 | 长期RL训练（持续更新reference policy） | 证明延长训练可突破base model推理边界 |
 
 #### 3.2 计算效率优化
 
-| 论文 | 核心方案 | 如何解决 |
+| 论文 | 核心方案 | 效率提升 |
 |------|----------|----------|
-| **TreePo** (2508.17445) | 树结构自引导rollout | 前缀共享+早停剪枝，节省22%-43% GPU时间 |
-| **ZeroSearch** (2505.04588) | 模拟搜索引擎 | 避免调用真实搜索API，降低成本同时提升训练速度 |
-| **SSRL** (2508.10874) | Self-Search RL | 完全offline训练，不依赖外部搜索引擎，成本降低到零 |
+| **TreePo** | 前缀共享+早停剪枝的树结构自引导rollout | **节省22%-43% GPU时间** |
+| **ZeroSearch** | 用LLM作为retrieval module，避免真实搜索API | 成本降低到零 |
+| **SSRL** | 不依赖外部搜索引擎，完全offline训练 | 成本降低到零 |
 
 #### 3.3 难度自适应探索
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **DARS** (2508.13755) | 难度自适应rollout采样 | 多阶段采样策略，为低准确度困难问题分配更多rollouts |
-| **LADDER** (2503.00735) | 自生成课程学习 | 模型自己生成progressively easier problems，自适应调整难度 |
-| **ReGFT** (2603.01223) | Reference-guided冷启动 | 用部分人工参考解法引导模型生成轨迹，保持在模型推理空间内，解决困难问题reward sparsity |
+| 论文 | 核心方案 |
+|------|----------|
+| **DARS** | 多阶段采样策略，为低准确度困难问题动态分配更多rollouts |
+| **LADDER** | 模型自己生成progressively easier problems，递归生成简化变体 |
+| **ReGFT** | 用部分人工参考解法引导模型生成轨迹，保持在模型推理空间内 |
 
-#### 3.4 记忆增强探索 ⭐ (ICLR 2026)
+#### 3.4 记忆增强探索 ⭐ (ICLR 2026突破)
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **EMPO²** (2602.23008) | Hybrid on/off-policy + 自生成记忆 | Self-generated tips存储探索经验，记忆增强prompting引导探索新状态，off-policy内化记忆知识到参数，intrinsic reward鼓励新状态发现 |
+| 论文 | 核心洞察 | 技术方案 | 关键成果 |
+|------|----------|----------|----------|
+| **EMPO²** ⭐ | 外部记忆可实现系统性探索 | Hybrid on/off-policy + 自生成记忆: Self-generated tips存储探索经验，记忆增强prompting引导探索新状态，off-policy内化记忆知识到参数，intrinsic reward鼓励新状态发现 | **ScienceWorld +128.6%**, WebShop +11.3%, OOD场景平均+136% |
 
-**突破性成果**:
-- ScienceWorld +128.6% over GRPO（7个任务满分）
-- WebShop +11.3% over GRPO
-- OOD场景：仅需few-shot记忆，无需参数更新，平均+136%适应性
-
-**核心洞察**: 探索不足是LLM Agent的关键瓶颈，EMPO²通过parametric（参数学习）+ non-parametric（外部记忆）双重更新，实现系统性探索而非依赖预训练知识
+**EMPO²的核心洞察**: 探索不足是LLM Agent的关键瓶颈。通过parametric（参数学习）+ non-parametric（外部记忆）双重更新，实现系统性探索而非依赖预训练知识。
 
 ---
 
-## 挑战四：信用分配 (45%论文提及)
+## 挑战四：信用分配 (44%论文提及)
 
 ### 问题本质
 
 长程Agentic任务中，**如何将最终奖励精确归因到每个决策步骤**：
 
-| 子问题 | 描述 | 频率 |
-|--------|------|------|
-| **Token/Step级归因不足** | 轨迹级奖励无法区分各步骤贡献 | 6篇 |
-| **长视野推理归因** | 数百步推理中早期错误的定位 | 4篇 |
-| **Multi-turn归因** | 多轮对话中各轮贡献不清 | 6篇 ⬆️ |
+- **Token/Step级归因不足** (6篇): 轨迹级奖励无法区分各步骤贡献
+- **长视野推理归因** (4篇): 数百步推理中早期错误的定位
+- **Multi-turn归因** (6篇): 多轮对话中各轮贡献不清
 
 ### 代表性论文及解决方案
 
-#### 4.1 步骤级信用分配
+#### 4.1 Token/Step级归因
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **ELPO** (2602.09598) | 二分搜索定位first irrecoverable step | 通过rollout tree和binary search精确定位导致失败的关键步骤，分层优势归因 |
-| **Step-GRPO** (2503.12937) | 步骤级推理奖励 | 为CoT中每个推理步骤设计独立的Reasoning Accuracy Reward和Validity Reward |
-| **ARPO** (2507.19849) | Step-wise credit assignment | 结合熵信号和步骤级奖励，多轮工具交互中每个action都获得精确反馈 |
-| **VinePPO** (2410.01679) | Unbiased MC estimates | 用完整trajectory return替代value估计，消除value bias导致的credit misattribution |
-| **CM2** (2602.12268) | Checklist Rewards | 7个细粒度评估组件（规则遵守、任务完成、交互质量等），turn-level密集反馈 |
+| 论文 | 核心洞察 | 技术方案 | 创新点 |
+|------|----------|----------|--------|
+| **ELPO** (ICLR 2026) | 二分搜索可定位关键错误 | 通过rollout tree和binary search精确定位first irrecoverable step，分层优势归因 | **精确定位错误步骤** |
+| **Step-GRPO** | 步骤可独立评估 | 为CoT中每个推理步骤设计独立的Reasoning Accuracy Reward和Validity Reward | 步骤级过程监督 |
+| **ARPO** | 熵信号可用于步骤级归因 | 结合熵信号和步骤级奖励，多轮工具交互中每个action都获得精确反馈 | 多轮场景步骤级反馈 |
+| **VinePPO** | MC estimates可消除value bias | 完全移除value network，用完整trajectory return替代value估计 | 消除value bias导致的misattribution |
+| **CM2** | Checklist可多维度评估 | 7个细粒度评估组件，turn-level密集反馈 | 多维度过程监督 |
 
-#### 4.2 Multi-turn专项归因 ⭐ (2026 Q1新趋势)
+#### 4.2 Multi-turn专项归因 ⭐ (2026 Q1突破)
 
-**问题特殊性**: Multi-turn场景中，各轮交互存在依赖关系，简单的outcome reward无法区分各轮贡献
+**问题特殊性**: Multi-turn场景中，各轮交互存在依赖关系，简单的outcome reward无法区分各轮贡献。
 
-| 论文 | 核心方案 | 如何解决 |
-|------|----------|----------|
-| **SeeUPO** (2602.06554) ⭐ | 顺序更新 + Backward induction | 将multi-turn建模为顺序执行的multi-agent bandit，反向逐轮更新策略，保证收敛到全局最优 |
-| **ProxMO** (2602.19225) | 邻近性软聚合 | Step级通过连续语义加权导出baseline，替代discrete batch统计，全局上下文集成 |
-| **IGPO** (2510.14967) | Information Gain内在奖励 | Turn-level reward = 策略产生正确答案概率的边际增加，直接来自模型belief updates |
+| 论文 | 核心洞察 | 技术方案 | 关键成果 |
+|------|----------|----------|----------|
+| **SeeUPO** ⭐ | Multi-turn可建模为顺序决策 | 顺序更新 + backward induction，反向逐轮更新策略 | **首个multi-turn收敛保证** (AppWorld +43.3%, BFCL +24.1%) |
+| **ProxMO** (ICLR 2026) | 语义邻近性可实现软聚合 | Step级通过连续语义加权导出baseline，替代discrete batch统计 | Plug-and-play工业解决方案 |
+| **IGPO** | 信息增益可度量每轮贡献 | Turn-level reward = 策略产生正确答案概率的边际增加 | **无需外部RM**的intrinsic reward |
 
-**关键突破**：
-- SeeUPO提供**首个multi-turn收敛保证** (AppWorld +43.3%, BFCL +24.1%)
-- IGPO提供**intrinsic reward**，无需外部reward model
-- ProxMO提供**plug-and-play**工业解决方案
-
----
-
-## 次要挑战（重要但频率较低）
-
-### 挑战五：知识局限性 (36%论文提及)
-
-**问题**: LLM内部知识有限，导致知识密集型任务幻觉和过时信息。
-
-| 论文 | 解决方案 |
-|------|----------|
-| **WebThinker** (2504.21776) | Deep Web Explorer + Think-Search-Draft策略，动态调用外部知识 |
-| **R1-Searcher** (2503.05592) | 两阶段RL训练搜索能力，学习何时/如何调用搜索 |
-| **SSRL** (2508.10874) | Self-Search RL增强内部知识利用，减少外部依赖 |
-| **START** (2503.04625) | Tool-integrated long CoT，用外部工具（代码执行）验证推理 |
-
----
-
-### 挑战六：工具集成困难 (32%论文提及)
-
-**问题**: 如何在推理与工具使用之间取得平衡，何时调用工具。
-
-| 论文 | 解决方案 |
-|------|----------|
-| **ToRL** (2503.23383) | Tool-integrated RL，reward-driven learning发现emergent tool-use patterns |
-| **ARPO** (2507.19849) | 熵自适应rollout机制，自动平衡内部推理和工具使用 |
-| **START** (2503.04625) | Hint-infer策略，在CoT关键位置插入hint刺激工具调用 |
-| **DART** (2602.00994) | LoRA解耦reasoning和tool-use参数，避免梯度冲突 |
-
----
-
-### 挑战七：泛化能力 (29%论文提及)
-
-**问题**: 模型容易模仿表面模式，难以真正理解和泛化。
-
-| 论文 | 解决方案 |
-|------|----------|
-| **LUFFY** (2504.14945) | Off-policy guidance避免僵化模仿，OOD任务提升6.2分 |
-| **Step-GRPO** (2503.12937) | 学习理解错误推理路径，而非仅模仿成功路径 |
-| **CHORD** (2508.11408) | 动态权重协调SFT和RL，避免过拟合expert data |
-| **VinePPO** (2410.01679) | MC estimates改善泛化，测试集提升显著 |
-
----
-
-### 挑战八：可扩展性 (已分析的15篇论文)
-
-**问题**: 环境构建、数据生成、大规模训练的成本与效率。
-
-| 论文 | 解决方案 |
-|------|----------|
-| **Agent World Model** (2602.10090) | 代码驱动合成1000环境，SQLite后端提供一致性状态转换 |
-| **Tool-R0** (2602.21320) | Generator-Solver自博弈，零数据假设下自我进化 |
-| **GEM** (2601.10355) | 从文本语料提取轨迹，scalable数据合成pipeline |
-| **ASTER** (2602.01204) | Interaction-dense冷启动，4K高交互密度轨迹避免collapse |
+**2026 Q1突破总结**:
+- **SeeUPO**提供**首个理论保证**: Multi-turn RL可以收敛到全局最优
+- **ProxMO**提供**工业解决方案**: 语义邻近性软聚合，无需修改模型架构
+- **IGPO**提供**自包含方案**: 完全基于模型内部belief updates，无需外部reward model
 
 ---
 
@@ -282,272 +194,40 @@ Agentic RL面临的最根本问题是**如何设计高质量的学习信号**：
 训练稳定性 ←→ 信用分配
     ↓ (制约)
 探索效率
-    ↓ (影响)
-泛化能力
 ```
 
-**关键洞察**：
-1. **奖励信号是源头**：稀疏/噪声奖励导致方差爆炸，进而影响训练稳定性
-2. **Credit assignment是桥梁**：精确归因可以改善奖励信号质量
-3. **探索效率受制约**：不稳定的训练限制了探索范围
-4. **泛化能力是终点**：有效探索和稳定训练最终反映在泛化性能上
-
----
-
-## 算法演进脉络
-
-### 阶段1：消除值函数 (2025年初)
-```
-PPO (需要Critic)
-    ↓
-GRPO (Group Relative Reward，消除Critic)
-```
-**突破**：用组相对奖励替代值函数，简化训练pipeline
-
-### 阶段2：稳定性增强 (2025年Q1-Q2)
-```
-GRPO
-    ↓
-DAPO (解耦clip)
-    ↓
-GMPO (几何平均)
-    ↓
-ProRL (reference reset)
-```
-**突破**：解决GRPO的IS ratio极端化和outlier问题
-
-### 阶段3：过程监督引入 (2025年Q2-Q3)
-```
-Outcome-only GRPO
-    ↓
-Step-GRPO (步骤级奖励)
-    ↓
-ARPO (熵+步骤级)
-    ↓
-EDGE-GRPO (熵驱动advantage)
-```
-**突破**：从结果奖励走向过程奖励
-
-### 阶段4：效率与泛化 (2025年Q3-Q4)
-```
-On-policy GRPO
-    ↓
-LUFFY (Off-policy guidance)
-    ↓
-TreePo (树结构rollout)
-    ↓
-DARS (难度自适应)
-```
-**突破**：提升探索效率和泛化能力
-
-### 阶段5：Multi-turn专项与理论保证 (2026年Q1) ⭐
-
-```
-通用GRPO方法
-    ↓
-Multi-turn专项优化
-    ├─ SeeUPO (收敛保证理论)
-    ├─ ProxMO (难度感知信用分配)
-    └─ IGPO (内在信息增益奖励)
-    ↓
-系统框架
-    ├─ ARLArena (稳定性分析框架)
-    └─ ReGFT (参考引导冷启动)
-```
-**突破**：
-- **理论保证**：SeeUPO首次提供multi-turn收敛保证
-- **Multi-turn专项**：从通用方法到场景专项优化
-- **系统框架**：ARLArena提供系统分析工具
-
----
-
-## 核心挑战的本质
-
-### 底层矛盾
-
-Agentic RL的四大核心挑战源于一个**根本性矛盾**：
-
-> **Agent任务的长程性、开放性、交互性** vs **RL算法对短程、可验证、单步决策的假设**
-
-| Agent任务特征 | RL算法假设 | 产生的挑战 |
-|--------------|------------|-----------|
-| 长程推理（数百步） | 短程决策（10-100步） | 信用分配困难、方差爆炸 |
-| 开放式目标 | 可验证奖励 | 奖励稀疏、难以设计 |
-| 多步骤交互 | 单步反馈 | 延迟反馈、归因不清 |
-| 巨大动作空间 | 小动作空间 | 探索低效 |
-| 异步训练需求 | 同步训练稳定 | IS ratio失控 |
-
----
-
-## 未来研究方向（基于挑战）
-
-### 方向1：更精细的信用分配机制
-
-**当前状态**: Step-GRPO等提供步骤级奖励，但仍是粗粒度  
-**未来方向**: Token级、Reasoning node级的精细归因
-
-**代表工作**:
-- ELPO的binary search定位
-- ARPO的step-wise credit
-- OTB的token-level baseline
-
-### 方向2：自适应训练策略
-
-**当前状态**: 固定超参数，手动调整  
-**未来方向**: 根据训练动态自动调整learning rate、clip、KL系数
-
-**代表工作**:
-- VCPO的ESS-guided scaling
-- VAPO的自适应KL
-- DAPO的动态采样
-
-### 方向3：混合奖励信号
-
-**当前状态**: Outcome reward或Process reward，二选一  
-**未来方向**: 自动融合outcome + process + intrinsic signals
-
-**代表工作**:
-- Step-GRPO的规则化奖励
-- EDGE-GRPO的熵驱动
-- CM2的Checklist多维度
-
-### 方向4：Self-evolving训练
-
-**当前状态**: 依赖人工数据和环境  
-**未来方向**: 自我生成数据、环境、课程
-
-**代表工作**:
-- Tool-R0的Generator-Solver
-- LADDER的递归简化
-- DARS的难度自适应
-
----
-
-## 方法论总结：如何识别核心挑战
-
-**本报告的方法论**：
-
-1. **论文采样**: 34篇算法改进论文（GRPO 10篇 + PPO/DPO 5篇 + 应用13篇 + 2026 Q1新增6篇）
-2. **挑战提取**: 从每篇论文的Abstract和Introduction提取"problem statement"
-3. **频率统计**: 统计每个挑战在多少篇论文中被提及
-4. **验证映射**: 确认每篇论文确实解决了归类的挑战
-5. **关系分析**: 分析挑战间的因果关系
-
-**局限性声明**：
-- ✅ 基于34篇论文的系统分析（覆盖主流算法，包含2026 Q1最新工作，涵盖ICLR 2026）
-- ✅ 频率统计客观反映研究热点
-- ⚠️ 未覆盖GUI Agent、Embodied Agent等子领域的特定挑战
-- ⚠️ 未覆盖工业界闭源系统可能面临的其他挑战
-
----
-
-## 论文-挑战映射表（详细版）
-
-### GRPO家族
-
-| 论文 | 挑战1 | 挑战2 | 挑战3 | 挑战4 | 验证 |
-|------|-------|-------|-------|-------|------|
-| DAPO | ✅ 稳定性 (IS ratio) | ✅ 奖励 (稀疏) | ✅ 探索 (动态采样) | - | Abstract明确提及 |
-| LUFFY | ✅ 探索 (on-policy限制) | ✅ 泛化 (OOD) | ✅ 奖励 (off-policy) | - | Abstract核心主题 |
-| GMPO | ✅ 稳定性 (outlier tokens) | ✅ 奖励 (几何平均) | - | - | Abstract标题即问题 |
-| ProRL | ✅ 探索 (推理边界) | ✅ 稳定性 (KL控制) | - | - | Abstract研究问题 |
-| Step-GRPO | ✅ 奖励 (稀疏→步骤级) | ✅ 信用分配 (步骤级) | ✅ 泛化 (理解错误) | - | 核心贡献 |
-| EDGE-GRPO | ✅ 奖励 (advantage collapse) | ✅ 稳定性 (梯度) | - | - | Abstract问题陈述 |
-| ARPO | ✅ 信用分配 (步骤级) | ✅ 奖励 (熵信号) | ✅ 工具使用 (平衡) | - | Multi-turn核心问题 |
-| TreePo | ✅ 探索 (计算效率) | ✅ 稳定性 (多样性) | - | - | Abstract核心贡献 |
-| DARS | ✅ 探索 (困难样本) | ✅ 奖励 (难度自适应) | - | - | Abstract问题 |
-| CHORD | ✅ 稳定性 (SFT-RL冲突) | ✅ 泛化 (过拟合) | - | - | Abstract挑战 |
-
-### PPO/Value-based方法
-
-| 论文 | 挑战1 | 挑战2 | 挑战3 | 验证 |
-|------|-------|-------|-------|------|
-| VAPO | ✅ 稳定性 (value bias) | ✅ 奖励 (异构序列) | ✅ 信用分配 (长CoT) | Abstract三大挑战 |
-| VinePPO | ✅ 稳定性 (value估计) | ✅ 信用分配 (MC) | ✅ 泛化 (测试性能) | Abstract核心问题 |
-| PF-PPO | ✅ 奖励 (噪声) | ✅ 稳定性 (过滤) | - | Abstract问题 |
-
-### 应用论文
-
-| 论文 | 挑战1 | 挑战2 | 挑战3 | 验证 |
-|------|-------|-------|-------|------|
-| ELPO | ✅ 信用分配 (error localization) | ✅ 奖励 (稀疏) | - | 标题即问题 |
-| CM2 | ✅ 奖励 (不可验证) | ✅ 信用分配 (multi-turn) | - | Abstract核心 |
-| ToRL | ✅ 探索 (工具策略) | ✅ 奖励 (outcome) | - | Abstract问题 |
-| LADDER | ✅ 探索 (课程学习) | ✅ 奖励 (自生成) | - | Abstract核心 |
-| START | ✅ 知识 (内部不足) | ✅ 工具使用 (hint) | ✅ 奖励 (稀疏) | Abstract问题 |
-| WebThinker | ✅ 知识 (静态) | ✅ 探索 (搜索策略) | - | Abstract问题 |
-| ZeroSearch | ✅ 探索 (成本) | ✅ 奖励 (噪声) | - | Abstract两大挑战 |
-| SSRL | ✅ 探索 (API依赖) | ✅ 知识 (内部利用) | - | Abstract问题 |
-
-### 2026 Q1新增论文 ⭐
-
-| 论文 | 挑战1 | 挑战2 | 挑战3 | 验证 |
-|------|-------|-------|-------|------|
-| ARLArena | ✅ 稳定性 (系统框架) | ✅ 方法论 (4维分解) | - | Abstract核心 |
-| SeeUPO | ✅ 稳定性 (收敛保证) | ✅ 信用分配 (multi-turn) | - | Abstract理论证明 |
-| ProxMO | ✅ 信用分配 (难度感知) | ✅ 奖励 (语义邻近) | - | Abstract核心 |
-| ReGFT | ✅ 奖励 (稀疏) | ✅ 探索 (冷启动) | - | Abstract核心 |
-| IGPO | ✅ 奖励 (稀疏) | ✅ 信用分配 (turn-level) | - | Abstract两大问题 |
-| EMPO² | ✅ 探索 (记忆增强) | ✅ 稳定性 (off-policy) | ✅ 泛化 (OOD) | ICLR 2026 |
+**关键洞察**: 奖励信号是源头（稀疏/噪声导致方差爆炸），信用分配是桥梁（精确归因改善奖励质量），探索效率受制约（不稳定训练限制探索）。
 
 ---
 
 ## 结论
 
-基于**34篇**论文的系统分析，**Agentic RL训练算法的核心挑战**可确认为：
+### 四大核心挑战的本质
 
-### 主要挑战（出现频率>40%）
+Agentic RL的挑战源于一个**根本性矛盾**:
 
-1. **奖励信号质量** (68%)
-   - 稀疏奖励是普遍问题
-   - Noise和advantage collapse次之
-   - **2026趋势**：Intrinsic reward (IGPO, EMPO²), Reference-guided (ReGFT)
+> **Agent任务的长程性、开放性、交互性** vs **RL算法对短程、可验证、单步决策的假设**
 
-2. **训练稳定性** (53%)
-   - IS ratio控制是GRPO家族共同关注点
-   - 方差控制是异步训练核心问题
-   - **2026突破**：收敛保证理论 (SeeUPO ⭐), 系统框架 (ARLArena), Off-policy稳定 (EMPO²)
+| Agent任务特征 | RL算法假设 | 产生的挑战 |
+|--------------|------------|-----------|
+| 长程推理（数百步） | 短程决策（10-100步） | 信用分配困难、方差爆炸（稳定性） |
+| 开放式目标 | 可验证奖励 | 奖励稀疏、难以设计（奖励质量） |
+| 多步骤交互 | 单步反馈 | 延迟反馈、归因不清（信用分配） |
+| 巨大动作空间 | 小动作空间 | 探索低效（探索效率） |
 
-3. **探索效率** (44%) ⬆️
-   - **探索不足是关键瓶颈** (EMPO²)
-   - On-policy局限制约能力扩展
-   - 计算成本限制大规模训练
-   - **2026突破**：记忆增强探索 (EMPO², +128.6%), 困难问题冷启动 (ReGFT)
+### 2026 Q1关键突破
 
-4. **信用分配** (44%)
-   - 长程任务的精确归因仍是难题
-   - Step/token级精度不足
-   - **2026焦点**：Multi-turn专项优化（3篇论文）
-
-### 新兴挑战（出现频率20-40%）
-
-5. **知识局限性** (30%) - 驱动搜索Agent发展
-6. **工具集成** (27%) - 推理与工具的平衡
-7. **泛化能力** (24%) - 从模仿到理解
-
-### 2026 Q1关键进展
-
-| 进展 | 论文 | 意义 |
-|------|------|------|
-| **首个收敛保证** | SeeUPO | Multi-turn理论突破 |
-| **系统框架** | ARLArena | Policy gradient统一视角 |
-| **Multi-turn专项** | SeeUPO, ProxMO, IGPO | 场景化优化趋势 |
-| **Intrinsic reward** | IGPO, EMPO² | 减少外部依赖 |
-| **探索机制突破** | EMPO² ⭐ | 记忆增强探索，ICLR 2026, +128.6% |
-
-### 方法论可信度评估
-
-| 维度 | 评分 | 说明 |
-|------|------|------|
-| **论文覆盖** | ⭐⭐⭐⭐⭐ | 34篇论文，覆盖2024-2026 Q1主流算法，包含ICLR 2026 |
-| **挑战验证** | ⭐⭐⭐⭐⭐ | 每篇论文的problem statement已核实 |
-| **频率统计** | ⭐⭐⭐⭐⭐ | 客观统计，无主观臆断 |
-| **应用广度** | ⭐⭐⭐⭐⭐ | 覆盖算法改进+应用+最新理论+顶会论文 |
-| **工业视角** | ⭐⭐⭐⭐ | 包含工业界论文（Microsoft, 阿里、字节、UCLA等） |
+| 突破 | 论文 | 解决的挑战 | 意义 |
+|------|------|------------|------|
+| **首个收敛保证** | SeeUPO | 训练稳定性 + 信用分配 | **理论上证明multi-turn RL可收敛** |
+| **记忆增强探索** | EMPO² | 探索效率 | **+128.6%提升**，parametric+non-parametric双重更新 |
+| **系统分析框架** | ARLArena | 训练稳定性 | 首个ARL稳定性系统分析工具 |
+| **Intrinsic reward** | IGPO | 奖励信号质量 + 信用分配 | 无需外部RM，自包含解决方案 |
+| **语义邻近性** | ProxMO | 信用分配 | Plug-and-play工业方案 |
 
 ---
 
 **报告生成日期**: 2026-03-09  
-**论文分析数量**: 34篇（GRPO 10篇 + PPO/DPO 5篇 + 应用13篇 + 2026 Q1新增6篇）  
-**参考Survey**: ArXiv 2509.02547 (500+论文综述)  
-**重点论文**: SeeUPO (收敛保证), EMPO² (探索突破, ICLR 2026), ARLArena (系统框架)
+**论文分析数量**: 47篇  
+**核心挑战**: 奖励信号质量(68%)、训练稳定性(53%)、探索效率(44%)、信用分配(44%)  
+**重点论文**: SeeUPO (收敛保证), EMPO² (探索突破), ARLArena (系统框架), IGPO (intrinsic reward), ProxMO (语义邻近性)
