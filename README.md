@@ -1,6 +1,6 @@
 # LLM Post-Training 与 Agentic RL 研究
 
-> **作者**: Zhen Liang | **最后更新**: 2026-03-17
+> **作者**: Xavier | **最后更新**: 2026-03-17
 
 本仓库包含两份独立但互补的技术报告：
 
@@ -33,11 +33,14 @@
 
 ---
 
-## 📖 参考材料
+## 📄 PDF 版本
 
-- [CORE_CHALLENGES_DEEP_REPORT.md](./tmp-docs/CORE_CHALLENGES_DEEP_REPORT.md) — Agentic RL 阅读笔记
-- [INFLUENCE_ASSESSMENT.md](./tmp-docs/INFLUENCE_ASSESSMENT.md) — 论文影响力评估
-- [PAPERS_LIST.md](./tmp-docs/PAPERS_LIST.md) — 47 篇调研论文完整列表
+由于 GitHub 对 Markdown 中 LaTeX 公式的渲染支持有限，本仓库同时提供 PDF 版本以便更好地阅读数学公式：
+
+- **Post-Training 报告**: [pdfs/post-training-report/](./pdfs/post-training-report/)
+- **Agentic RL 报告**: [pdfs/agentic-rl-report/](./pdfs/agentic-rl-report/)
+
+PDF 使用 pandoc + xelatex 生成，支持中文（PingFang SC 字体）。
 
 ---
 
