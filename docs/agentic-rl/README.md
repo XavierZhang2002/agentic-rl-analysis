@@ -35,7 +35,7 @@
 
 ## 与 Post-Training 报告的关系
 
-本报告聚焦 **Agentic RL 的专项算法和挑战**，是对 [Post-Training 技术报告](../post-training-report/README.md) 的补充：
+本报告聚焦 **Agentic RL 的专项算法和挑战**，是对 [Post-Training 技术报告](../post-training/README.md) 的补充：
 
 | 内容 | Post-Training 报告 | 本报告 |
 |------|-------------------|--------|

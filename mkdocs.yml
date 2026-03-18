@@ -56,7 +56,6 @@ nav:
       - 概述: agentic-rl/index.md
       - 第一篇 - 算法与关键技术: agentic-rl/01-算法与关键技术.md
       - 第二篇 - 综合分析与展望: agentic-rl/02-综合分析与展望.md
-  - PDF 版本: pdfs.md
 
 markdown_extensions:
   - admonition

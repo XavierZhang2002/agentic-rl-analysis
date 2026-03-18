@@ -34,17 +34,6 @@ description: LLM Post-Training 与 Agentic RL 研究知识库
 
 ---
 
-## 📄 PDF 版本
-
-由于 Markdown 对 LaTeX 公式的渲染支持有限，本知识库同时提供 PDF 版本以便更好地阅读数学公式：
-
-- **Post-Training 报告**: [pdfs/post-training-report/](./pdfs.md#post-training-报告)
-- **Agentic RL 报告**: [pdfs/agentic-rl-report/](./pdfs.md#agentic-rl-报告)
-
-PDF 使用 pandoc + xelatex 生成，支持中文（PingFang SC 字体）。
-
----
-
 ## 快速导航
 
 <div class="grid" markdown>

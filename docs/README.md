@@ -9,7 +9,6 @@ agentic-rl-analysis/
 ├── mkdocs.yml              # MkDocs 主配置文件
 ├── docs/                   # 网站内容目录
 │   ├── index.md           # 首页
-│   ├── pdfs.md            # PDF 下载页面
 │   ├── post-training/     # Post-Training 报告
 │   │   ├── index.md
 │   │   ├── 01-算法与基本原理.md
@@ -23,7 +22,6 @@ agentic-rl-analysis/
 │   │   └── mathjax.js     # MathJax 配置
 │   └── stylesheets/       # 自定义 CSS
 │       └── extra.css      # 额外样式
-├── pdfs/                  # PDF 文件（已存在）
 └── .github/workflows/     # GitHub Actions
     └── ci.yml             # 自动部署配置
 ```
