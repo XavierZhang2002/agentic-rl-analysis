@@ -1,10 +1,10 @@
 site_name: "LLM Post-Training 与 Agentic RL 研究"
 site_description: "系统梳理大语言模型后训练与 Agentic RL 的技术报告"
 site_author: "Xavier"
-site_url: https://zhenliang.org/agentic-rl-analysis
+site_url: https://XavierZhang2002.github.io/agentic-rl-analysis
 
 repo_name: "agentic-rl-analysis"
-repo_url: https://github.com/zhenliang/agentic-rl-analysis
+repo_url: https://github.com/XavierZhang2002/agentic-rl-analysis
 edit_uri: edit/main/docs/
 
 theme:
