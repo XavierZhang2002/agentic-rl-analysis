@@ -1,6 +1,6 @@
 # Agentic RL 调研报告
 
-> **作者**: Zhen Liang  
+> **作者**: Xavier  
 > **最后更新**: 2026-03-17  
 > **定位**: 面向有 RL 基础的读者，系统梳理 Agentic RL（多轮交互、工具使用、长程规划场景下的强化学习）的算法设计、核心挑战与发展方向  
 > **数据来源**: 47 篇论文（2024-2026 Q1）的系统性分析
@@ -75,4 +75,4 @@
 
 ---
 
-*本报告基于截至 2026 年 3 月的公开论文和技术博客撰写。原始阅读笔记参见 [CORE_CHALLENGES_DEEP_REPORT](../tmp-docs/CORE_CHALLENGES_DEEP_REPORT.md)，影响力评估参见 [INFLUENCE_ASSESSMENT](../tmp-docs/INFLUENCE_ASSESSMENT.md)。*
+*本报告基于截至 2026 年 3 月的公开论文和技术博客撰写。*
