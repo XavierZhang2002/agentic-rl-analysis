@@ -91,5 +91,3 @@ extra_css:
 
 plugins:
   - search
-  - minify:
-      minify_html: true
