@@ -1,0 +1,95 @@
+site_name: "LLM Post-Training 与 Agentic RL 研究"
+site_description: "系统梳理大语言模型后训练与 Agentic RL 的技术报告"
+site_author: "Xavier"
+site_url: https://zhenliang.org/agentic-rl-analysis
+
+repo_name: "agentic-rl-analysis"
+repo_url: https://github.com/zhenliang/agentic-rl-analysis
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: 切换到暗色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: 切换到亮色模式
+  font:
+    text: Noto Sans SC
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/zhenliang
+  version:
+    provider: mike
+
+nav:
+  - 首页: index.md
+  - Post-Training 技术报告:
+      - 概述: post-training/index.md
+      - 第一章 - 算法与基本原理: post-training/01-算法与基本原理.md
+      - 第二章 - 技术报告解读与训练经验: post-training/02-技术报告解读与训练经验.md
+      - 第三章 - 发展路线与方向思考: post-training/03-发展路线与方向思考.md
+  - Agentic RL 调研报告:
+      - 概述: agentic-rl/index.md
+      - 第一篇 - 算法与关键技术: agentic-rl/01-算法与关键技术.md
+      - 第二篇 - 综合分析与展望: agentic-rl/02-综合分析与展望.md
+  - PDF 版本: pdfs.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: true
+      slugify: !!python/name:pymdownx.slugs.uslugify
+  - tables
+  - footnotes
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search
+  - minify:
+      minify_html: true

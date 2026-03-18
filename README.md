@@ -2,6 +2,10 @@
 
 > **作者**: Xavier | **最后更新**: 2026-03-17
 
+[![Website](https://img.shields.io/badge/Website-Online-blue)](https://zhenliang.github.io/agentic-rl-analysis)
+
+📖 **在线阅读**: https://zhenliang.github.io/agentic-rl-analysis
+
 本仓库包含两份独立但互补的技术报告：
 
 ---
@@ -41,6 +45,34 @@
 - **Agentic RL 报告**: [pdfs/agentic-rl-report/](./pdfs/agentic-rl-report/)
 
 PDF 使用 pandoc + xelatex 生成，支持中文（PingFang SC 字体）。
+
+---
+
+## 🌐 本地运行网站
+
+本仓库使用 [MkDocs](https://www.mkdocs.org/) + [Material](https://squidfunk.github.io/mkdocs-material/) 构建静态网站。
+
+### 安装依赖
+
+```bash
+pip install mkdocs-material pymdown-extensions
+```
+
+### 本地预览
+
+```bash
+mkdocs serve
+```
+
+访问 http://127.0.0.1:8000
+
+### 部署到 GitHub Pages
+
+```bash
+mkdocs gh-deploy
+```
+
+或者推送到 `main` 分支，GitHub Actions 会自动部署。
 
 ---
 

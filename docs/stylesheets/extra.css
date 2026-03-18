@@ -1,0 +1,108 @@
+/* 自定义样式 */
+
+/* 网格布局用于首页 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.grid-item {
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  transition: box-shadow 0.3s ease;
+}
+
+.grid-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 强调块样式优化 */
+.md-typeset .admonition,
+.md-typeset details {
+  border-left-width: 4px;
+}
+
+/* 表格样式优化 */
+.md-typeset table {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.md-typeset table th {
+  background: var(--md-primary-fg-color--light);
+  color: var(--md-primary-bg-color);
+  font-weight: 600;
+}
+
+.md-typeset table tr:nth-child(2n) {
+  background: var(--md-code-bg-color);
+}
+
+/* 数学公式样式 */
+.md-typeset .MathJax {
+  font-size: 100%;
+}
+
+/* 引用块样式 */
+.md-typeset blockquote {
+  border-left: 4px solid var(--md-primary-fg-color);
+  padding-left: 1rem;
+  font-style: italic;
+  color: var(--md-default-fg-color--light);
+}
+
+/* 代码块样式优化 */
+.md-typeset pre {
+  border-radius: 4px;
+}
+
+.md-typeset code {
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+}
+
+/* 目录样式优化 */
+.md-nav {
+  font-size: 0.7rem;
+}
+
+.md-nav__link {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+/* PDF 链接样式 */
+a[href$=".pdf"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+a[href$=".pdf"]::before {
+  content: "📄";
+  font-size: 1.1em;
+}
+
+/* 暗色模式优化 */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #1e2129;
+  --md-default-fg-color: #e8eaed;
+  --md-default-fg-color--light: #9aa0a6;
+  --md-code-bg-color: #2d333b;
+  --md-primary-fg-color--light: #5c6bc0;
+}
+
+/* 响应式优化 */
+@media screen and (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .md-header__title {
+    font-size: 0.8rem;
+  }
+}
