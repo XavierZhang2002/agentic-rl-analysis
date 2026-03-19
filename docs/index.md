@@ -7,7 +7,7 @@ hide:
 
 # LLM Post-Training 与 Agentic RL 研究
 
-<p class="byline">by <strong>Xavier</strong> · 2026.03 · 基于 50+ 篇论文与 12+ 模型技术报告</p>
+<p class="byline">by <strong>[zhenliang](https://github.com/XavierZhang2002)</strong> & <strong>opencode</strong> · 2026.03 · 基于 50+ 篇论文与 12+ 模型技术报告</p>
 
 ---
 
