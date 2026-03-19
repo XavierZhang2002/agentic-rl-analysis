@@ -71,8 +71,8 @@ nav:
           - 2.8 跨模型训练经验: post-training/ch2/2.8-cross-model.md
       - 3. 演进路线与趋势展望:
           - 3.1 技术演进与范式变迁: post-training/ch3/3.1-timeline-paradigms.md
-          - 3.2 核心挑战与未来方向: post-training/ch3/3.2-challenges-future.md
-          - 3.3 个人观点: post-training/ch3/3.3-opinions.md
+          - 3.2 行业共识与核心挑战: post-training/ch3/3.2-challenges-future.md
+          - 3.3 个人分析与思考: post-training/ch3/3.3-opinions.md
   - Agentic RL 调研报告:
       - 概述: agentic-rl/index.md
       - 1. 算法与核心挑战:
