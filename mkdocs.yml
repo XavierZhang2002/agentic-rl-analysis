@@ -72,6 +72,8 @@ markdown_extensions:
   - toc:
       permalink: true
       slugify: !!python/name:pymdownx.slugs.uslugify
+  - attr_list
+  - md_in_html
   - tables
   - footnotes
   - pymdownx.tasklist:

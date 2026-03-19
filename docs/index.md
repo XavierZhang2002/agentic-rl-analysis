@@ -36,26 +36,39 @@ description: LLM Post-Training 与 Agentic RL 研究知识库
 
 ## 快速导航
 
-<div class="grid" markdown>
+<div class="grid cards" markdown>
 
-<div class="grid-item" markdown>
-### 🎯 快速了解
-- [Post-Training 概述](./post-training/index.md)
-- [Agentic RL 概述](./agentic-rl/index.md)
-- [第二章：技术报告解读](./post-training/02-技术报告解读与训练经验.md) — 工业实践
-</div>
+-   :material-target: **快速了解**
 
-<div class="grid-item" markdown>
-### 📊 深入算法
-- [第一章：算法与基本原理](./post-training/01-算法与基本原理.md) — 六大算法详解
-- [第一篇：Agentic RL 算法](./agentic-rl/01-算法与关键技术.md) — 四大挑战
-</div>
+    ---
 
-<div class="grid-item" markdown>
-### 🔮 未来方向
-- [第三章：发展路线与方向思考](./post-training/03-发展路线与方向思考.md)
-- [第二篇：综合分析与展望](./agentic-rl/02-综合分析与展望.md)
-</div>
+    两份报告的概述入口与工业实践精华
+
+    [:octicons-arrow-right-24: Post-Training 概述](./post-training/index.md)
+
+    [:octicons-arrow-right-24: Agentic RL 概述](./agentic-rl/index.md)
+
+    [:octicons-arrow-right-24: 第二章：技术报告解读](./post-training/02-技术报告解读与训练经验.md)
+
+-   :material-chart-bar: **深入算法**
+
+    ---
+
+    算法原理与关键技术详解
+
+    [:octicons-arrow-right-24: 第一章：算法与基本原理](./post-training/01-算法与基本原理.md)
+
+    [:octicons-arrow-right-24: 第一篇：Agentic RL 算法](./agentic-rl/01-算法与关键技术.md)
+
+-   :material-crystal-ball: **未来方向**
+
+    ---
+
+    发展路线、趋势判断与个人观点
+
+    [:octicons-arrow-right-24: 第三章：发展路线与方向思考](./post-training/03-发展路线与方向思考.md)
+
+    [:octicons-arrow-right-24: 第二篇：综合分析与展望](./agentic-rl/02-综合分析与展望.md)
 
 </div>
 
