@@ -1,24 +1,6 @@
 /* 自定义样式 */
 
-/* 网格布局用于首页 */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin: 2rem 0;
-}
-
-.grid-item {
-  padding: 1.5rem;
-  border-radius: 8px;
-  background: var(--md-default-bg-color);
-  border: 1px solid var(--md-default-fg-color--lightest);
-  transition: box-shadow 0.3s ease;
-}
-
-.grid-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+/* 网格布局用于首页 - Material grid cards 使用内置样式 */
 
 /* 强调块样式优化 */
 .md-typeset .admonition,
@@ -66,10 +48,6 @@
 }
 
 /* 目录样式优化 */
-.md-nav {
-  font-size: 0.7rem;
-}
-
 .md-nav__link {
   margin-top: 0.3em;
   margin-bottom: 0.3em;
@@ -98,10 +76,6 @@ a[href$=".pdf"]::before {
 
 /* 响应式优化 */
 @media screen and (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-  
   .md-header__title {
     font-size: 0.8rem;
   }
