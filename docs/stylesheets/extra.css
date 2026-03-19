@@ -1,5 +1,19 @@
 /* 自定义样式 */
 
+/* 作者署名行 */
+.byline {
+  margin-top: -0.6rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--md-default-fg-color--light);
+  letter-spacing: 0.02em;
+}
+
+.byline strong {
+  color: var(--md-primary-fg-color);
+  font-weight: 600;
+}
+
 /* 网格布局用于首页 - Material grid cards 使用内置样式 */
 
 /* 强调块样式优化 */
