@@ -3,6 +3,10 @@ title: LLM Post-Training 与 Agentic RL 研究
 description: 系统梳理大语言模型后训练与 Agentic RL 的算法原理、工业实践与前沿方向
 hide:
   - navigation
+tags:
+  - 首页
+  - Post-Training
+  - Agentic RL
 ---
 
 # LLM Post-Training 与 Agentic RL 研究

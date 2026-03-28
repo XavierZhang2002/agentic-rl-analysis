@@ -33,6 +33,10 @@ theme:
     - navigation.sections
     - navigation.expand
     - navigation.top
+    - navigation.footer
+    - navigation.path
+    - navigation.instant
+    - navigation.instant.progress
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -123,3 +127,4 @@ extra_css:
 
 plugins:
   - search
+  - tags
