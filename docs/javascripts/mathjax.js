@@ -11,3 +11,10 @@ window.MathJax = {
     processHtmlClass: 'tex2jax_process'
   }
 };
+
+document$.subscribe(function() {
+  MathJax.startup.output.clearCache();
+  MathJax.typesetClear();
+  MathJax.texReset();
+  MathJax.typesetPromise();
+});
