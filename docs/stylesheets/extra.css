@@ -80,15 +80,14 @@ a[href$=".pdf"]::before {
 }
 
 /* Mermaid 图表样式优化 */
-.md-typeset .mermaid {
+.md-typeset .mermaid-custom {
   margin: 1.2rem auto;
   text-align: center;
 }
 
-.md-typeset .mermaid svg {
+.md-typeset .mermaid-custom svg {
   max-width: 100%;
   height: auto;
-  font-family: 'Noto Sans SC', -apple-system, sans-serif;
 }
 
 /* 暗色模式优化 */
