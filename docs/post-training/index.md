@@ -27,7 +27,7 @@ tags:
 
     ---
 
-    DeepSeek R1/V3.2、Kimi K1.5/K2、Qwen3、MiniMax M1/M2.5、GLM-5、Seed1.5 等 6 大系列的训练策略与工程经验，附 10 条跨模型共性总结。
+    DeepSeek R1/V3.2、Kimi K1.5/K2、Qwen3、MiniMax M1/M2.5、GLM-5、Seed1.5 等 6 大系列的训练策略与工程经验，附 10 条跨模型共性总结与数据工程专题。
 
     [:octicons-arrow-right-24: 开始阅读](./ch2/2.1-deepseek.md)
 
