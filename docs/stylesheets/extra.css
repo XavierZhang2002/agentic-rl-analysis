@@ -79,6 +79,18 @@ a[href$=".pdf"]::before {
   font-size: 1.1em;
 }
 
+/* Mermaid 图表样式优化 */
+.md-typeset .mermaid {
+  margin: 1.2rem auto;
+  text-align: center;
+}
+
+.md-typeset .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+}
+
 /* 暗色模式优化 */
 [data-md-color-scheme="slate"] {
   --md-default-bg-color: #1e2129;
