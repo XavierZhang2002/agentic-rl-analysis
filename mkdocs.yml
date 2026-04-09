@@ -74,6 +74,7 @@ nav:
           - 2.7 闭源模型概览: post-training/ch2/2.7-closed-source.md
           - 2.8 跨模型训练经验: post-training/ch2/2.8-cross-model.md
           - 2.9 数据工程专题: post-training/ch2/2.9-data-engineering.md
+          - 2.10 基座的 Agentic 能力是怎么训出来的: post-training/ch2/2.10-agentic-training.md
       - 3. 演进路线与趋势展望:
           - 3.1 技术演进与范式变迁: post-training/ch3/3.1-timeline-paradigms.md
           - 3.2 行业共识与核心挑战: post-training/ch3/3.2-challenges-future.md
