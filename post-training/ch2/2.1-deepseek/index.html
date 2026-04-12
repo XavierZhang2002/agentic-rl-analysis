@@ -1,0 +1,3041 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="深度解读 DeepSeek 系列（R1、V3、V3.2）的后训练技术演进，涵盖纯 RL 推理涌现、高效蒸馏和 Specialist Distillation 范式。">
+      
+      
+        <meta name="author" content="Xavier">
+      
+      
+        <link rel="canonical" href="https://XavierZhang2002.github.io/agentic-rl-analysis/post-training/ch2/2.1-deepseek/">
+      
+      
+        <link rel="prev" href="../../ch1/1.12-evolution/">
+      
+      
+        <link rel="next" href="../2.2-kimi/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>DeepSeek -- 纯 RL 到 Specialist Distillation - LLM Post-Training 与 Agentic RL 研究</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Noto Sans SC";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#21-deepseek----纯-rl-到-specialist-distillation" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../.." title="LLM Post-Training 与 Agentic RL 研究" class="md-header__button md-logo" aria-label="LLM Post-Training 与 Agentic RL 研究" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LLM Post-Training 与 Agentic RL 研究
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              DeepSeek -- 纯 RL 到 Specialist Distillation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到暗色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到暗色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="切换到亮色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到亮色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/XavierZhang2002/agentic-rl-analysis" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    agentic-rl-analysis
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Post-Training 技术报告
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../agentic-rl/" class="md-tabs__link">
+          
+  
+  
+  Agentic RL 调研报告
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="LLM Post-Training 与 Agentic RL 研究" class="md-nav__button md-logo" aria-label="LLM Post-Training 与 Agentic RL 研究" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LLM Post-Training 与 Agentic RL 研究
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/XavierZhang2002/agentic-rl-analysis" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    agentic-rl-analysis
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-Training 技术报告
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Post-Training 技术报告
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. 算法基础
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    1. 算法基础
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.1-training-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.1 大模型训练全景
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.2-rlhf-rlvr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.2 RLHF 与 RLVR 两大范式
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.3-dpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.3 DPO — 离线偏好优化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.4-ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.4 PPO — 经典策略优化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.5-grpo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.5 GRPO — RLVR 奠基算法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.6-dapo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.6 DAPO — 工业级优化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.7-vapo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.7 VAPO — Value 路线回归
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.8-cispo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.8 CISPO — 序列级裁剪
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.9-gspo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.9 GSPO — 序列级策略优化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.10-sapo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.10 SAPO — 平滑门控
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.11-cheatsheet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.11 算法公式速查表
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch1/1.12-evolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.12 演进逻辑总结
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. 技术报告深度解读
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2. 技术报告深度解读
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.1 DeepSeek
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.1 DeepSeek
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#deepseek-r1----纯-rl-推理涌现" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepSeek-R1 -- 纯 RL 推理涌现
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepSeek-R1 -- 纯 RL 推理涌现">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心动机" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心动机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r1-zero纯-rl-的涌现实验" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R1-Zero：纯 RL 的涌现实验
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#四阶段-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四阶段 Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpo-的选择理由" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GRPO 的选择理由
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#失败尝试报告-section-34----极有价值的负面结果" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        失败尝试（报告 Section 3.4 -- 极有价值的负面结果）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#蒸馏模型蒸馏--直接-rl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        蒸馏模型：蒸馏 &gt;&gt; 直接 RL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deepseek-v3----高效后训练与蒸馏" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepSeek-V3 -- 高效后训练与蒸馏
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepSeek-V3 -- 高效后训练与蒸馏">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心动机_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心动机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-training-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Post-Training Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#极致成本效率" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        极致成本效率
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-token-prediction-mtp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Token Prediction (MTP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deepseek-v32----specialist-distillation-与-grpo-工程化" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepSeek-V3.2 -- Specialist Distillation 与 GRPO 工程化
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepSeek-V3.2 -- Specialist Distillation 与 GRPO 工程化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心动机_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心动机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#架构变化" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        架构变化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#三阶段后训练-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三阶段后训练 Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#四个-grpo-稳定化创新" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四个 GRPO 稳定化创新
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#后训练成本的剧变" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        后训练成本的剧变
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#关键结果" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        关键结果
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#负面结果与局限" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        负面结果与局限
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#系列演进分析" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        系列演进分析
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.2-kimi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.2 Kimi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.3-qwen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.3 Qwen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.4-minimax/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.4 MiniMax
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.5-glm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.5 GLM-5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.6-seed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.6 Seed
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.7-closed-source/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.7 闭源模型概览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.8-cross-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.8 跨模型训练经验
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.9-data-engineering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.9 数据工程专题
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.10-agentic-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.10 基座的 Agentic 能力是怎么训出来的
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. 演进路线与趋势展望
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    3. 演进路线与趋势展望
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch3/3.1-timeline-paradigms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1 技术演进与范式变迁
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch3/3.2-challenges-future/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.2 行业共识与核心挑战
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ch3/3.3-opinions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.3 个人分析与思考
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic RL 调研报告
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agentic RL 调研报告
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agentic-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. 算法与核心挑战
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    1. 算法与核心挑战
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agentic-rl/ch1/1.1-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.1 从推理 RL 到 Agentic RL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agentic-rl/ch1/1.2-reward-stability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.2 奖励信号与训练稳定性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agentic-rl/ch1/1.3-exploration-credit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.3 探索效率与信用分配
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agentic-rl/ch1/1.4-engineering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.4 工程实践
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agentic-rl/ch1/1.5-algorithm-summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1.5 算法速查与路线图
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. 全景分析与展望
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2. 全景分析与展望
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agentic-rl/ch2/2.1-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.1 领域全景与技术路线
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../agentic-rl/ch2/2.2-outlook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.2 核心判断与未来预测
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#deepseek-r1----纯-rl-推理涌现" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepSeek-R1 -- 纯 RL 推理涌现
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepSeek-R1 -- 纯 RL 推理涌现">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心动机" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心动机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r1-zero纯-rl-的涌现实验" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        R1-Zero：纯 RL 的涌现实验
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#四阶段-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四阶段 Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpo-的选择理由" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GRPO 的选择理由
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#失败尝试报告-section-34----极有价值的负面结果" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        失败尝试（报告 Section 3.4 -- 极有价值的负面结果）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#蒸馏模型蒸馏--直接-rl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        蒸馏模型：蒸馏 &gt;&gt; 直接 RL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deepseek-v3----高效后训练与蒸馏" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepSeek-V3 -- 高效后训练与蒸馏
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepSeek-V3 -- 高效后训练与蒸馏">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心动机_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心动机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-training-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Post-Training Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#极致成本效率" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        极致成本效率
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-token-prediction-mtp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Token Prediction (MTP)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deepseek-v32----specialist-distillation-与-grpo-工程化" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepSeek-V3.2 -- Specialist Distillation 与 GRPO 工程化
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepSeek-V3.2 -- Specialist Distillation 与 GRPO 工程化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#核心动机_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心动机
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#架构变化" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        架构变化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#三阶段后训练-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三阶段后训练 Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#四个-grpo-稳定化创新" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四个 GRPO 稳定化创新
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#后训练成本的剧变" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        后训练成本的剧变
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#关键结果" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        关键结果
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#负面结果与局限" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        负面结果与局限
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#系列演进分析" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        系列演进分析
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="导航栏" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    首页
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Post-Training 技术报告
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="./" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    2. 技术报告深度解读
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">DeepSeek</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">R1</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">V3</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="21-deepseek----纯-rl-到-specialist-distillation">2.1 DeepSeek -- 纯 RL 到 Specialist Distillation<a class="headerlink" href="#21-deepseek----纯-rl-到-specialist-distillation" title="Permanent link">&para;</a></h1>
+<div class="admonition abstract">
+<p class="admonition-title">本节摘要</p>
+<p>DeepSeek 系列在后训练领域建立了三条关键路径：R1 证明纯 RL 可从零涌现推理能力，V3 展示蒸馏以极低成本获取推理能力的路径（后训练仅占总成本 0.18%），V3.2 引入 Specialist Distillation 与 GRPO 工程化改进，将后训练预算提升至预训练的 &gt;10%，实现 AIME 从 39.2 到 93.1 的质变。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">阅读说明</p>
+<p>本章对 2024-2026 年主流大模型的 Post-Training 技术报告进行深度解读。分析以原始论文为依据，重点关注训练动机、Pipeline 设计、算法创新和工程经验。</p>
+<p><strong>详略安排</strong>：</p>
+<ul>
+<li><strong>深度解读</strong>（一至六节）：DeepSeek（含 V3.2）、Kimi、Qwen（含 SAPO）、MiniMax、GLM、Seed 六大系列 -- 均有完整技术报告，Post-Training 方法论对领域有显著推动</li>
+<li><strong>概要总结</strong>（第七节）：OpenAI、Google、Anthropic 等闭源模型 -- 技术披露有限，侧重可考证的关键信息</li>
+<li><strong>跨模型分析</strong>（第八节）：纵向演进与横向比较，提炼共性经验与趋势</li>
+</ul>
+<p>每个系列的分析遵循"<strong>动机 -- 方法 -- 发现 -- 演进</strong>"的结构，确保既有技术深度，也有系列间的可比性。</p>
+</div>
+<div class="admonition abstract">
+<p class="admonition-title">报告来源</p>
+<ul>
+<li><strong>DeepSeek-R1</strong>: <em>Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</em>, <a href="https://arxiv.org/abs/2501.12948">arXiv:2501.12948</a> (2025.01)</li>
+<li><strong>DeepSeek-V3</strong>: <em>DeepSeek-V3 Technical Report</em>, <a href="https://arxiv.org/abs/2412.19437">arXiv:2412.19437</a> (2024.12)</li>
+<li><strong>DeepSeek-V3.2</strong>: <em>DeepSeek-V3.2 Technical Report</em>, <a href="https://arxiv.org/abs/2512.02556">arXiv:2512.02556</a> (2025.12)</li>
+</ul>
+</div>
+<p>DeepSeek 系列在 Post-Training 领域的核心贡献有二：R1 证明了<strong>纯 RL 可以从零涌现推理能力</strong>，V3 则展示了<strong>通过蒸馏以极低成本获取推理能力</strong>的路径。两者共同奠定了 2025 年后训练范式的基础。</p>
+<h2 id="deepseek-r1----纯-rl-推理涌现">DeepSeek-R1 -- 纯 RL 推理涌现<a class="headerlink" href="#deepseek-r1----纯-rl-推理涌现" title="Permanent link">&para;</a></h2>
+<figure>
+  <img alt="DeepSeek-R1 训练流程" src="../../../images/post-training/survey-r1-workflow.png" width="95%" />
+<br />
+<figcaption>DeepSeek-R1 训练流程概览：(a) R1-Zero 直接在基座模型上做 GRPO；(b) R1 完整四阶段 Pipeline — Cold Start SFT → Reasoning RL → Rejection Sampling SFT → General RL（图源：arXiv:2503.06072 基于 arXiv:2501.12948 绘制）</figcaption>
+</figure>
+<h3 id="核心动机">核心动机<a class="headerlink" href="#核心动机" title="Permanent link">&para;</a></h3>
+<p>R1 面对的核心问题是：<strong>如何让模型学会复杂的多步推理（如竞赛级数学），而不需要昂贵的人工推理链标注？</strong> 传统 SFT on CoT 路线受限于标注员的推理能力和成本。DeepSeek 的假设是：基座模型在预训练中已蕴含推理的"种子"，RL 的作用是<strong>选择性地激活和强化这些种子</strong>。</p>
+<h3 id="r1-zero纯-rl-的涌现实验">R1-Zero：纯 RL 的涌现实验<a class="headerlink" href="#r1-zero纯-rl-的涌现实验" title="Permanent link">&para;</a></h3>
+<p>DeepSeek 做了一个极端实验——<strong>R1-Zero</strong>：跳过所有 SFT，直接在 DeepSeek-V3 Base（671B MoE, 37B 激活参数）上做 GRPO，仅使用规则奖励（数学正确性 + 格式约束），不用任何神经网络 RM。</p>
+<div class="admonition success">
+<p class="admonition-title">涌现行为（报告 Figure 3-4）</p>
+<ul>
+<li><strong>"aha moment"</strong>: 模型自发学会 "Wait, let me reconsider..." 并纠正推理错误 -- 自我反思能力从 RL 中自然涌现</li>
+<li><strong>思维链自然延长</strong>: 困难问题上自动生成更长的推理过程，学会按需分配"思考预算"</li>
+<li><strong>自我验证</strong>: 学会回头检查计算结果，"wait"、"alternatively" 等反思词频增加 5-7 倍</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">暴露的问题</p>
+<p>语言混杂（多种语言混用）、可读性差、格式不稳定。说明<strong>纯 RL 能涌现推理能力，但需要 SFT 提供基本的格式和可读性约束</strong>。</p>
+</div>
+<p>R1-Zero 在 AIME 2024 达到 71.0%（对比 V3 Base 的 39.2%），证明了假设的成立。</p>
+<h3 id="四阶段-pipeline">四阶段 Pipeline<a class="headerlink" href="#四阶段-pipeline" title="Permanent link">&para;</a></h3>
+<pre class="mermaid-custom"><code>flowchart TD
+    Base([DeepSeek-V3 Base\n671B MoE]) --&gt; S1[Cold Start SFT\n数千条长 CoT]
+    S1 --&gt; S2[Reasoning RL\nGRPO 与规则奖励]
+    S2 --&gt; S3[Rej. Sampling SFT\n~800K 样本]
+    S3 --&gt; S4[All-Scenario RL\n多 RM 联合]
+    S4 --&gt; Final([DeepSeek-R1\nAIME 79.8%])</code></pre>
+<p>数据来源与步数细节见下表。</p>
+<p><strong>关键设计细节</strong>（报告 Section 3-4）：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>关键数据</th>
+<th>设计理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cold Start SFT</td>
+<td>数千条样本，来源含 R1-Zero 过滤输出 + 人工精修</td>
+<td>最小化 SFT 数据量，保留 RL 探索空间</td>
+</tr>
+<tr>
+<td>Reasoning RL</td>
+<td>LR=3×10⁻⁶, G=16 outputs/query, max 65K tokens</td>
+<td>GRPO 无需 Critic，节省 ~25%+ 显存</td>
+</tr>
+<tr>
+<td>Rej. Sampling SFT</td>
+<td>800K 样本（数学 395K, 代码 211K, STEM 10K, 逻辑 10K, 通用 178K）</td>
+<td><strong>从 V3-Base 重新训练</strong>（非继续训练），避免 RL 阶段引入的分布偏移</td>
+</tr>
+<tr>
+<td>All-Scenario RL</td>
+<td>偏好 RM 仅评估最终摘要（非推理过程），安全 RM 使用 106K 数据</td>
+<td>偏好 RM 仅用于最后 400/1700 步，<strong>更长暴露会导致 reward hacking</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="grpo-的选择理由">GRPO 的选择理由<a class="headerlink" href="#grpo-的选择理由" title="Permanent link">&para;</a></h3>
+<p>对 671B MoE 模型，训练同等规模的 Critic 网络<strong>显存不可承受</strong>。GRPO 通过 group 内相对优势代替 value baseline：</p>
+<div class="arithmatex">\[\hat{A}_i = \frac{r_i - \text{mean}(r_1 \ldots r_G)}{\text{std}(r_1 \ldots r_G)}\]</div>
+<p>数学/代码任务有确定答案，规则奖励 + Group Relative 优势已够用，同时避免 Critic 在长 CoT 中的累积误差。</p>
+<h3 id="失败尝试报告-section-34----极有价值的负面结果">失败尝试（报告 Section 3.4 -- 极有价值的负面结果）<a class="headerlink" href="#失败尝试报告-section-34----极有价值的负面结果" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>尝试</th>
+<th>结果</th>
+<th>报告分析</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Process Reward Model (PRM)</strong></td>
+<td>效果不如 Outcome RM</td>
+<td>中间步骤难以精确标注正确性，大规模 RL 中 reward hacking 不可避免，重新训练 PRM 增加复杂度</td>
+</tr>
+<tr>
+<td><strong>Monte Carlo Tree Search (MCTS)</strong></td>
+<td>在 LLM 场景不 work</td>
+<td>搜索空间指数级增长（token-level &gt;&gt; 棋盘游戏），value 估计不准，AlphaGo 式迭代自我改进未能复现</td>
+</tr>
+<tr>
+<td><strong>直接基座 RL（R1-Zero）</strong></td>
+<td>能力涌现但不可用</td>
+<td>需要 SFT 提供格式约束</td>
+</tr>
+</tbody>
+</table>
+<h3 id="蒸馏模型蒸馏--直接-rl">蒸馏模型：蒸馏 &gt;&gt; 直接 RL<a class="headerlink" href="#蒸馏模型蒸馏--直接-rl" title="Permanent link">&para;</a></h3>
+<p>R1 报告的另一个关键发现是<strong>蒸馏的效率远超直接 RL</strong>。用 R1 生成的 804K 推理样本对小模型做纯 SFT（无 RL），效果碾压同尺寸模型的直接 RL：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>方法</th>
+<th>AIME 2024</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen2.5-32B + RL (10K+ steps)</td>
+<td>从头 RL</td>
+<td>47.0</td>
+</tr>
+<tr>
+<td>QwQ-32B-Preview</td>
+<td>RL</td>
+<td>44.0</td>
+</tr>
+<tr>
+<td><strong>R1-Distill-Qwen-32B</strong></td>
+<td><strong>SFT 蒸馏</strong></td>
+<td><strong>72.6</strong></td>
+</tr>
+<tr>
+<td><strong>R1-Distill-Qwen-1.5B</strong></td>
+<td><strong>SFT 蒸馏</strong></td>
+<td><strong>28.9</strong>（超过 GPT-4o 的 9.3）</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition success">
+<p class="admonition-title">核心发现</p>
+<p>蒸馏比直接 RL 高出 <strong>+25 AIME 分</strong>。大教师模型的推理模式通过 SFT 迁移比小模型通过 RL 自行发现高效得多。报告指出在蒸馏模型上进一步做 RL "会显著提升性能"，但留给社区探索。</p>
+</div>
+<h2 id="deepseek-v3----高效后训练与蒸馏">DeepSeek-V3 -- 高效后训练与蒸馏<a class="headerlink" href="#deepseek-v3----高效后训练与蒸馏" title="Permanent link">&para;</a></h2>
+<h3 id="核心动机_1">核心动机<a class="headerlink" href="#核心动机_1" title="Permanent link">&para;</a></h3>
+<p>V3 面对的问题是：<strong>如何在已有 R1 推理能力的前提下，高效地将这种能力整合到通用模型中？</strong> 从头做 RL 太贵，但直接 SFT on R1 数据又会损失通用性。</p>
+<h3 id="post-training-pipeline">Post-Training Pipeline<a class="headerlink" href="#post-training-pipeline" title="Permanent link">&para;</a></h3>
+<pre class="mermaid-custom"><code>flowchart TD
+    S1([双轨 SFT\n~1.5M]) --&gt; S1a[R1 蒸馏推理数据]
+    S1 --&gt; S1b[通用 V2.5 数据]
+    S1a --&gt; S2[GRPO\n规则与模型 RM]
+    S1b --&gt; S2
+    S2 --&gt; S3([Self-Rewarding\nRewardBench 87])</code></pre>
+<p>样本规模与 epoch 见正文；R1 蒸馏含标准回答与长 CoT 两种格式。</p>
+<p><strong>R1 蒸馏的具体流程</strong>（报告 Section 5）：</p>
+<ol>
+<li>用内部 R1 模型生成原始推理数据</li>
+<li>训练领域专家模型（SFT + RL）</li>
+<li>两种 SFT 样本类型：标准 <code>&lt;problem, response&gt;</code> 和 R1 风格 <code>&lt;system_prompt, problem, R1_response&gt;</code>（含反思/验证）</li>
+<li>高温 RL 整合两种模式</li>
+<li>Rejection Sampling 选出简洁、高质量的输出</li>
+</ol>
+<p><strong>Self-Rewarding</strong>: V3 自身作为 judge（Constitutional AI 思路），在 RewardBench 上达到 87.0（maj@6 投票 89.6），与 Claude-3.5-Sonnet（88.7）和 GPT-4o（86.7）相当。</p>
+<h3 id="极致成本效率">极致成本效率<a class="headerlink" href="#极致成本效率" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>H800 GPU Hours</th>
+<th>成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>预训练</td>
+<td>2,664K</td>
+<td>$5.328M</td>
+</tr>
+<tr>
+<td>上下文扩展</td>
+<td>119K</td>
+<td>$0.238M</td>
+</tr>
+<tr>
+<td><strong>后训练</strong></td>
+<td><strong>5K</strong></td>
+<td><strong>$0.01M</strong></td>
+</tr>
+<tr>
+<td><strong>总计</strong></td>
+<td><strong>2,788K</strong></td>
+<td><strong>$5.576M</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition success">
+<p class="admonition-title">核心发现</p>
+<p>Post-Training 仅占总训练成本的 <strong>0.18%</strong>（5K GPU hours / $10K）。这证明在有强教师模型（R1）的前提下，蒸馏 + Self-Rewarding 可以实现极高的后训练效率。</p>
+</div>
+<h3 id="multi-token-prediction-mtp">Multi-Token Prediction (MTP)<a class="headerlink" href="#multi-token-prediction-mtp" title="Permanent link">&para;</a></h3>
+<p>V3 引入 D=1 的 MTP 模块，在推理时用于投机解码，接受率 85-90%，实现 <strong>1.8× TPS 加速</strong>。MTP 模块在训练完成后可丢弃（除非用于投机解码），训练损失权重从 λ=0.3 逐步降至 0.1。</p>
+<h2 id="deepseek-v32----specialist-distillation-与-grpo-工程化">DeepSeek-V3.2 -- Specialist Distillation 与 GRPO 工程化<a class="headerlink" href="#deepseek-v32----specialist-distillation-与-grpo-工程化" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">论文来源</p>
+<p><a href="https://arxiv.org/abs/2512.02556">arXiv:2512.02556</a> -- <em>DeepSeek-V3.2 Technical Report</em> (2025.12)</p>
+</div>
+<h3 id="核心动机_2">核心动机<a class="headerlink" href="#核心动机_2" title="Permanent link">&para;</a></h3>
+<p>V3.2 面对的问题是：<strong>V3 的蒸馏路线虽然高效，但后训练成本仅占预训练的 0.18%，是否意味着后训练的潜力远未被开发？</strong> V3.2 的回答是肯定的 -- 将后训练计算预算提升至<strong>预训练成本的 &gt;10%</strong>，并用全新的 Specialist Distillation 范式替代简单的 R1 蒸馏。</p>
+<h3 id="架构变化">架构变化<a class="headerlink" href="#架构变化" title="Permanent link">&para;</a></h3>
+<p>V3.2 的基础架构与 V3/V3.1 <strong>完全相同</strong>（671B MoE, 37B 激活），唯一的架构新增是 <strong>DeepSeek Sparse Attention (DSA)</strong> -- 通过在 V3 checkpoint 上继续训练约 946B tokens 来适配。V3.2 论文未提及 MTP。</p>
+<h3 id="三阶段后训练-pipeline">三阶段后训练 Pipeline<a class="headerlink" href="#三阶段后训练-pipeline" title="Permanent link">&para;</a></h3>
+<pre class="mermaid-custom"><code>flowchart TD
+    Base([V3.1 + DSA 续训]) --&gt; S1[Specialist Distillation\n8 域专家 RL]
+    S1 --&gt; S2[Mixed GRPO\n推理与 Agent]
+    S2 --&gt; S3[V3.2-Speciale\n长链推理变体]
+    S3 --&gt; Final([DeepSeek-V3.2\nAIME 93.1%])</code></pre>
+<p>IMO / IOI 等完整榜单见下文「关键结果」表。</p>
+<p><strong>阶段 1：Specialist Distillation</strong> -- 这是 V3.2 最核心的方法论创新，与 V3 的 R1 蒸馏有本质区别：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>V3 的 R1 蒸馏</th>
+<th>V3.2 的 Specialist Distillation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>教师来源</td>
+<td>单一 R1 模型</td>
+<td><strong>8 个领域专家模型</strong></td>
+</tr>
+<tr>
+<td>专家训练</td>
+<td>无（直接用 R1 输出）</td>
+<td>每个专家经过<strong>大规模 RL 训练</strong></td>
+</tr>
+<tr>
+<td>蒸馏方式</td>
+<td>SFT on R1 数据</td>
+<td>8 个专家各自蒸馏后合并</td>
+</tr>
+<tr>
+<td>覆盖领域</td>
+<td>主要是推理</td>
+<td>数学、代码、科学、写作、Agent 等 8 个域</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition success">
+<p class="admonition-title">核心发现：Specialist Distillation &gt;&gt; 单一教师蒸馏</p>
+<p>每个领域专家在其专属域上经过充分 RL 训练后再蒸馏，比从单一通用教师蒸馏效果显著更好。这相当于将"分治法"引入蒸馏 -- 先分域优化，再合并。</p>
+</div>
+<p><strong>阶段 2：Mixed RL</strong> -- 单一统一的 GRPO 阶段，同时处理推理任务、Agent 任务和人类偏好对齐。V3 需要多个 RL 阶段分别处理不同任务类型，V3.2 将它们合并为一个阶段。</p>
+<p><strong>阶段 3：V3.2-Speciale</strong> -- 推理专用变体，通过放松长度惩罚允许模型使用更多 token 来"深度思考"。</p>
+<h3 id="四个-grpo-稳定化创新">四个 GRPO 稳定化创新<a class="headerlink" href="#四个-grpo-稳定化创新" title="Permanent link">&para;</a></h3>
+<p>V3.2 报告了 4 个 GRPO 训练稳定性技巧，每个都针对具体问题：</p>
+<table>
+<thead>
+<tr>
+<th>技巧</th>
+<th>问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unbiased KL Estimate</strong></td>
+<td>标准 K3 KL 估计器有偏</td>
+<td>使用无偏 KL 估计替代，提高梯度信号质量</td>
+</tr>
+<tr>
+<td><strong>Off-Policy Sequence Masking</strong></td>
+<td>高 KL 偏差的负优势序列引入噪声</td>
+<td>对负优势且 KL 偏离大的序列整体 mask</td>
+</tr>
+<tr>
+<td><strong>Keep Routing</strong></td>
+<td>MoE 专家路由在采样和训练间不一致</td>
+<td><strong>保留采样时的路由决策用于训练</strong>（自 V3-0324 起采用）</td>
+</tr>
+<tr>
+<td><strong>Keep Sampling Mask</strong></td>
+<td>top-p/top-k 截断掩码在训练时丢失</td>
+<td>保留采样时的 truncation mask 用于概率计算</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition danger">
+<p class="admonition-title">Keep Routing 的重要性</p>
+<p>Keep Routing 解决的问题与 GSPO/CISPO 诊断的问题同源 -- MoE 专家路由的不一致导致 token 级概率计算不稳定。但 V3.2 选择了不同的解决路径：<strong>固定路由</strong>（而非改变 ratio 计算方式）。这是另一种有效的 MoE RL 稳定化策略。</p>
+</div>
+<h3 id="后训练成本的剧变">后训练成本的剧变<a class="headerlink" href="#后训练成本的剧变" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>V3</th>
+<th>V3.2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>后训练占预训练比例</td>
+<td><strong>0.18%</strong></td>
+<td><strong>&gt;10%</strong></td>
+</tr>
+<tr>
+<td>后训练 GPU Hours</td>
+<td>~5K H800</td>
+<td><strong>数十万级</strong>（未精确公开）</td>
+</tr>
+</tbody>
+</table>
+<p>后训练计算量增加了约 <strong>50 倍以上</strong>。V3.2 团队明确表示 "RL scaling has not saturated" -- 持续增加 RL 预算仍能稳定提升性能。</p>
+<h3 id="关键结果">关键结果<a class="headerlink" href="#关键结果" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">V3.2 (通用模式)</label><label for="__tabbed_1_2">V3.2-Speciale (推理专用)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>V3.2</th>
+<th>V3</th>
+<th>提升</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AIME 2025</td>
+<td><strong>93.1%</strong></td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td>IMO 2025</td>
+<td><strong>Gold (35/42)</strong></td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td>IOI 2025</td>
+<td><strong>Gold (10th)</strong></td>
+<td>--</td>
+<td>--</td>
+</tr>
+<tr>
+<td>ICPC WF 2025</td>
+<td><strong>Gold (2nd)</strong></td>
+<td>--</td>
+<td>--</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tabbed-block">
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>V3.2-Speciale</th>
+<th>V3.2 (通用)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AIME 2025</td>
+<td><strong>96.0%</strong></td>
+<td>93.1%</td>
+</tr>
+<tr>
+<td>HMMT Feb 2025</td>
+<td><strong>99.2%</strong></td>
+<td>--</td>
+</tr>
+<tr>
+<td>Token 消耗</td>
+<td><strong>2-3× 更多</strong></td>
+<td>基线</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<h3 id="负面结果与局限">负面结果与局限<a class="headerlink" href="#负面结果与局限" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">V3.2 的已知局限</p>
+<ul>
+<li><strong>Token 效率不足</strong>：V3.2-Speciale 在推理任务上消耗的 token 是 Gemini-3.0-Pro 的 2-3 倍</li>
+<li><strong>上下文溢出</strong>：在长 Agent 任务中，128K 上下文窗口不够用，出现上下文溢出</li>
+<li><strong>IMO P6 = 0</strong>：在 IMO 2025 最难题上得零分，说明极端推理能力仍有天花板</li>
+<li><strong>域间 KL 调节</strong>：数学任务从弱/无 KL 惩罚中受益，但其他领域需要更强的 KL 约束 -- 需要域特定的超参数调节</li>
+</ul>
+</div>
+<h2 id="系列演进分析">系列演进分析<a class="headerlink" href="#系列演进分析" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>DeepSeek-V3 (2024.12)</th>
+<th>DeepSeek-R1 (2025.01)</th>
+<th>DeepSeek-V3.2 (2025.12)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>核心定位</td>
+<td>通用模型 + 推理增强</td>
+<td>专用推理模型</td>
+<td><strong>通用 + 推理统一</strong></td>
+</tr>
+<tr>
+<td>后训练核心策略</td>
+<td>R1 蒸馏 + Self-Rewarding</td>
+<td>纯 RL 涌现 + 多阶段精炼</td>
+<td><strong>Specialist Distillation + Mixed RL</strong></td>
+</tr>
+<tr>
+<td>RL 算法</td>
+<td>GRPO</td>
+<td>GRPO</td>
+<td>GRPO（4 项稳定化改进）</td>
+</tr>
+<tr>
+<td>RM 设计</td>
+<td>自身作为 judge + 规则 RM</td>
+<td>规则 RM 为主 + 偏好 RM（受限使用）</td>
+<td>规则 RM + 域特定 KL 调节</td>
+</tr>
+<tr>
+<td>后训练成本</td>
+<td><strong>5K H800 hours</strong></td>
+<td><strong>147K H800 hours</strong></td>
+<td><strong>&gt;预训练 10%</strong>（数十万级）</td>
+</tr>
+<tr>
+<td>AIME 2024</td>
+<td>39.2</td>
+<td><strong>79.8</strong></td>
+<td>--</td>
+</tr>
+<tr>
+<td>AIME 2025</td>
+<td>--</td>
+<td>--</td>
+<td><strong>93.1（通用）/ 96.0（Speciale）</strong></td>
+</tr>
+<tr>
+<td>技术遗产</td>
+<td>MTP 投机解码、Self-Rewarding</td>
+<td>GRPO 范式、蒸馏方法论、"RL 释放能力"假说</td>
+<td>Specialist Distillation、Keep Routing、"RL scaling 未饱和"</td>
+</tr>
+</tbody>
+</table>
+<p>DeepSeek 系列的关键贡献在于<strong>建立并演进了三条后训练路径</strong>：R1 式纯 RL 涌现、V3 式高效蒸馏、以及 V3.2 式 Specialist Distillation + 大规模 Mixed RL。V3.2 的出现证明了<strong>后训练的投资回报率远未触顶</strong> -- 将后训练预算从 0.18% 提升到 &gt;10% 带来了质的飞跃（AIME 39.2 → 93.1）。</p>
+<div class="admonition info">
+<p class="admonition-title">截至 2026 年 3 月的后续更新</p>
+<p>DeepSeek 发布了 R1-0528（2025.05，更新版 R1 checkpoint）、DeepSeek-Prover-V2（arXiv:2504.21801，形式化定理证明）、<strong>V3.2（2025.12，Specialist Distillation + GRPO 工程化）</strong> 等衍生模型，但<strong>尚未发布 R2 或 V4</strong>。V3.2 的 Specialist Distillation 范式和 GRPO 稳定化技巧已成为后训练方法论的重要参考。</p>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+        
+          
+          <a href="../../ch1/1.12-evolution/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 1.12 演进逻辑总结">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              <div class="md-ellipsis">
+                1.12 演进逻辑总结
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../2.2-kimi/" class="md-footer__link md-footer__link--next" aria-label="下一页: 2.2 Kimi">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              <div class="md-ellipsis">
+                2.2 Kimi
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/XavierZhang2002" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "navigation.path", "navigation.instant", "navigation.instant.progress", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.mjs" type="module"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
