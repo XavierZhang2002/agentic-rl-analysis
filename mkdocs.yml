@@ -90,6 +90,7 @@ nav:
       - 2. 全景分析与展望:
           - 2.1 领域全景与技术路线: agentic-rl/ch2/2.1-landscape.md
           - 2.2 核心判断与未来预测: agentic-rl/ch2/2.2-outlook.md
+  - 更新日志: changelog.md
 
 markdown_extensions:
   - admonition
