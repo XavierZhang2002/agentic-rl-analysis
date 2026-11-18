@@ -23,13 +23,16 @@
 
 ### Post-Training 技术报告
 
-> PPO → GRPO → DAPO → VAPO → CISPO → GSPO → SAPO 的算法演进全景
+> 六章一体：基础 → 算法 → 训练经济学 → 数据与工程 → 厂商档案 → 趋势
 
 | 章节 | 内容 |
 |:-----|:-----|
-| **算法基础** | RLHF 与 RLVR 两大范式，7 种核心算法的公式推导与对比 |
-| **深度解读** | 6 大模型系列的 Post-Training 实践，跨模型经验与数据工程专题 |
-| **趋势展望** | 6 大行业共识 · 5 大核心挑战 · 9 条个人观点 |
+| **1. 基础：流程与范式** | 训练三阶段；RLHF / DPO / RLVR；流程范式（三段式、四五段式、专家+合并）；奖励谱系（规则 → ORM → GRM → actor-as-GRM） |
+| **2. 算法主线** | PPO → GRPO → DAPO → VAPO → CISPO → GSPO → SAPO，以及 2026 的信任域新解法（DPPO / TRM / LPO / OTB） |
+| **3. 训练经济学** | rollout 分配、免 Critic 稠密信号、OPD/MOPD 合并 |
+| **4. 数据、环境与工程** | 数据工程、环境合成、一致性与基础设施（TITO / QAT / 异步）、验证器与 16 个失败模式 |
+| **5. 厂商档案** | DeepSeek、Kimi、Qwen、MiniMax、GLM、Seed、LongCat、Ling/Ring、闭源 |
+| **6. 全景与趋势** | 2026 技术报告全景、跨模型共识与挑战、时间线与个人判断 |
 
 ### Agentic RL 调研报告
 

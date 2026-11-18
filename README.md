@@ -23,13 +23,16 @@ Two independent but complementary technical surveys covering 70+ papers and 16 m
 
 ### Post-Training Technical Report
 
-> The full algorithm evolution: PPO → GRPO → DAPO → VAPO → CISPO → GSPO → SAPO
+> Six chapters in one narrative: foundations → algorithms → training economics → data & infra → vendor profiles → outlook
 
 | Chapter | Content |
 |:--------|:--------|
-| **Algorithm Foundations** | RLHF & RLVR paradigms, derivations and comparisons of 7 core algorithms |
-| **Deep Dives** | Post-training practices of 6 major model families, cross-model insights & data engineering |
-| **Trends & Outlook** | 6 industry consensuses · 5 core challenges · 9 personal perspectives |
+| **1. Foundations** | Training stages; RLHF / DPO / RLVR; pipeline paradigms (3-stage, 4–5-stage, expert+merge); reward lineage (rule → ORM → GRM → actor-as-GRM) |
+| **2. Algorithms** | PPO → GRPO → DAPO → VAPO → CISPO → GSPO → SAPO, plus the 2026 solutions (DPPO / TRM / LPO / OTB) |
+| **3. Training economics** | Rollout allocation, critic-free dense signals, OPD/MOPD merging |
+| **4. Data, environment & infrastructure** | Data engineering, environment synthesis, consistency (TITO / QAT / async), verifiers and 16 failure modes |
+| **5. Vendor profiles** | DeepSeek, Kimi, Qwen, MiniMax, GLM, Seed, LongCat, Ling/Ring, closed-source |
+| **6. Outlook** | 2026 report landscape, cross-model consensus & challenges, timeline and personal takes |
 
 ### Agentic RL Survey
 
