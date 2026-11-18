@@ -83,10 +83,9 @@ nav:
           - 5.7 LongCat（美团）: post-training/ch5/5.7-longcat.md
           - 5.8 Ling / Ring（蚂蚁）: post-training/ch5/5.8-ling-ring.md
           - 5.9 闭源模型: post-training/ch5/5.9-closed-source.md
-      - 6. 全景与趋势:
+      - 6. 全景与演进:
           - 6.1 2026 技术报告全景: post-training/ch6/6.1-overview-2026.md
-          - 6.2 跨模型对比与共识: post-training/ch6/6.2-cross-model.md
-          - 6.3 时间线与个人判断: post-training/ch6/6.3-timeline-opinions.md
+          - 6.2 演进与对比: post-training/ch6/6.2-evolution.md
       - 附录 A 算法公式速查: post-training/appendix/a-cheatsheet.md
   - Agentic RL 调研报告:
       - 概述: agentic-rl/index.md
@@ -99,7 +98,6 @@ nav:
       - 2. 全景分析与展望:
           - 2.1 领域全景与技术路线: agentic-rl/ch2/2.1-landscape.md
           - 2.2 核心判断与未来预测: agentic-rl/ch2/2.2-outlook.md
-  - 更新日志: changelog.md
 
 markdown_extensions:
   - admonition

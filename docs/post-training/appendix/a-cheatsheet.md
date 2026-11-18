@@ -33,19 +33,7 @@ tags:
 !!! info "怎么读这张表"
     - **同一族**：PPO → GRPO → DAPO → CISPO → SAPO 都在 token 级改 $f(r)$ 的形状（对称 → 非对称 → 裁权重 → 软门控）；GSPO 换的是粒度，DPPO / TRM / LPO 换的是约束对象或层级。
     - 逐项推导见 [2.1 PPO](../ch2/2.1-ppo.md)、[2.2 GRPO](../ch2/2.2-grpo.md)、[2.3 DAPO](../ch2/2.3-dapo.md)、[2.4 VAPO](../ch2/2.4-vapo.md)、[2.5 CISPO 与 GSPO](../ch2/2.5-cispo-gspo.md)、[2.6 SAPO](../ch2/2.6-sapo.md)。
-    - OTB 的 baseline 闭式解依赖 token 级回报的分布假设，本表只给"方差最小化"的形式定义 `[未核实]`。
-
-## 二、选型速查
-
-| 场景 | 推荐 | 一句话理由 |
-|---|---|---|
-| 短 CoT、dense 模型、要稳定复现 | **GRPO / DAPO** | 改动最小，社区实现最成熟 |
-| 长 CoT（>8K token）或长 trajectory | **GSPO → TRM** | 序列级约束把 $O(T^2)$ 的松弛收紧到 $O(T)$ |
-| MoE / 异步 / 训推偏差大 | **先做一致性，再选算法** | R3、确定性算子、QAT 不可省，见 [4.3 基础设施与一致性](../ch4/4.3-infra-consistency.md) |
-| rollout 成本 > 训练成本 | **SAO（单 rollout）/ OTB（token baseline）** | 前者省采样、后者省样本，都不用重写训练循环 |
-| 已是大规模生产管线 / 需要理论支撑 | **DPPO（散度约束）/ LPO（simplex 解释）** | 前者比 ratio clip 鲁棒，后者给 group-based PG 一个几何视角 |
-
-## 三、梯度形态速查
+## 二、梯度形态速查
 
 同一个 $\hat{A}$，各算法乘上去的系数不同——这才是它们行为差异的真正来源：
 
@@ -56,7 +44,7 @@ tags:
 | **GSPO** | $s_i\hat{A}_i$（整条序列共享一个系数） | 序列级裁剪，一次只影响一条序列 |
 | **SAPO** | $4p(1-p)\hat{A}_i$，$p=\sigma(\tau(r-1))$ | 平滑衰减，**永不为 0** |
 
-## 四、关键超参与默认值
+## 三、关键超参与默认值
 
 | 符号 | 含义 | 出处与取值 |
 |---|---|---|
@@ -67,7 +55,7 @@ tags:
 | $\tau_{\text{pos}},\ \tau_{\text{neg}}$ | 软门控温度 | SAPO $1.0$ / $1.05$ |
 | $\beta$ | KL / 参考策略约束强度 | GRPO 保留；DAPO 起明确移除（$\beta=0$） |
 
-## 五、三处最容易混的地方
+## 四、三处最容易混的地方
 
 1. **GSPO 的 $\varepsilon$ 小三个数量级不是调出来的**：$s_i$ 是 $|y_i|$ 个 log-ratio 的平均，方差比 token 级小 $\sqrt{N}$ 倍，所以 $3\times10^{-4}/4\times10^{-4}$ 的区间并不比 GRPO 的 $0.2$ 更紧。
 2. **CISPO 与 PPO 只差"裁谁"**：边界照旧存在，但被裁剪的标量进了 $\text{sg}()$，梯度不再归零——这是"权重衰减"而不是"硬停"。

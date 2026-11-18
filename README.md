@@ -11,7 +11,7 @@
 
 [English](README.md) | [中文](README_zh.md)
 
-<sub>Last updated **2026-11** · 算法内容覆盖 PPO → SAPO（2025.11），模型内容覆盖至 2026.03 · 更新记录见 [CHANGELOG](docs/changelog.md)</sub>
+<sub>Last updated **2026-11** · Algorithms covered from PPO to 2026 trust-region methods; models covered to 2026-11</sub>
 
 </div>
 
