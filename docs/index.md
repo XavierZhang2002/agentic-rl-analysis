@@ -14,7 +14,7 @@ tags:
 <p class="byline">by <strong><a href="https://github.com/XavierZhang2002">zhenliang</a></strong> & <strong>opencode</strong> · 2026.03 初版 · 2026.11 重构 · 基于 100+ 篇论文与 18 个模型代</p>
 
 !!! note "内容覆盖"
-    **Post-Training 技术报告**覆盖至 2026 年 11 月（算法至 DPPO/TRM/LPO、模型至 DeepSeek-V4 / Kimi K3 / GLM-5.3 / MiniMax M3 / LongCat-2.5 / Qwen4-Max）；**Agentic RL 调研报告**覆盖至 2026 Q1。版本变化见 [更新日志](./changelog.md)。
+    **Post-Training 技术报告**覆盖至 2026 年 11 月（算法至 DPPO/TRM/LPO、模型至 DeepSeek-V4 / Kimi K3 / GLM-5.3 / MiniMax M3 / LongCat-2.5 / Qwen4-Max）；**Agentic RL 调研报告**覆盖至 2026 Q1。
 
 ---
 
@@ -58,7 +58,7 @@ tags:
 
     [:octicons-arrow-right-24: 训练全景与两大范式](./post-training/ch1/1.1-training-landscape.md)
 
-    [:octicons-arrow-right-24: 演进时间线与五代范式](./post-training/ch6/6.3-timeline-opinions.md)
+    [:octicons-arrow-right-24: 演进时间线与五代范式](./post-training/ch6/6.2-evolution.md)
 
 -   :material-chart-bar: **深入算法**
 
