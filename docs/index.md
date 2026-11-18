@@ -11,7 +11,10 @@ tags:
 
 # LLM Post-Training 与 Agentic RL 研究
 
-<p class="byline">by <strong><a href="https://github.com/XavierZhang2002">zhenliang</a></strong> & <strong>opencode</strong> · 2026.03 · 基于 50+ 篇论文与 12+ 模型技术报告</p>
+<p class="byline">by <strong><a href="https://github.com/XavierZhang2002">zhenliang</a></strong> & <strong>opencode</strong> · 2026.03 初版 · 2026.11 校订 · 基于 70+ 篇论文与 16 份模型技术报告</p>
+
+!!! note "内容覆盖"
+    算法部分覆盖 PPO → SAPO（2025.11），模型部分覆盖至 **2026.03**；2026 Q2–Q4 的模型与算法更新正在补充，详见 [更新日志](./changelog.md)。
 
 ---
 

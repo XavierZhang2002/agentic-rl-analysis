@@ -64,6 +64,18 @@ nav:
           - 1.10 SAPO — 平滑门控: post-training/ch1/1.10-sapo.md
           - 1.11 算法公式速查表: post-training/ch1/1.11-cheatsheet.md
           - 1.12 演进逻辑总结: post-training/ch1/1.12-evolution.md
+          - 2026 增补:
+              - 1.13 信任域与目标函数的新解法: post-training/ch1/1.13-trust-region-2026.md
+              - 1.14 预算分配与免 Critic 的稠密信号: post-training/ch1/1.14-budget-and-dense-signal.md
+              - 1.15 一致性与验证器: post-training/ch1/1.15-consistency-and-verifier.md
+              - 1.16 合并机制 OPD / MOPD: post-training/ch1/1.16-merging-opd-mopd.md
+      - 机制专题（2026 重构中）:
+          - 2.1 2026 技术报告全景: post-training/ch2/themes/01-overview-2026.md
+          - 2.2 训练流程范式: post-training/ch2/themes/02-pipeline-paradigms.md
+          - 2.3 奖励设计谱系: post-training/ch2/themes/03-reward-lineage.md
+          - 2.4 数据与环境工程: post-training/ch2/themes/04-data-and-environment.md
+          - 2.5 基础设施与一致性: post-training/ch2/themes/05-infra-consistency.md
+          - 2.6 失败模式清单: post-training/ch2/themes/06-failure-modes.md
       - 2. 技术报告深度解读:
           - 2.1 DeepSeek: post-training/ch2/2.1-deepseek.md
           - 2.2 Kimi: post-training/ch2/2.2-kimi.md
@@ -75,6 +87,8 @@ nav:
           - 2.8 跨模型训练经验: post-training/ch2/2.8-cross-model.md
           - 2.9 数据工程专题: post-training/ch2/2.9-data-engineering.md
           - 2.10 基座的 Agentic 能力是怎么训出来的: post-training/ch2/2.10-agentic-training.md
+          - 2.11 LongCat（美团）: post-training/ch2/2.11-longcat.md
+          - 2.12 Ling / Ring（蚂蚁）: post-training/ch2/2.12-ling-ring.md
       - 3. 演进路线与趋势展望:
           - 3.1 技术演进与范式变迁: post-training/ch3/3.1-timeline-paradigms.md
           - 3.2 行业共识与核心挑战: post-training/ch3/3.2-challenges-future.md
@@ -90,6 +104,7 @@ nav:
       - 2. 全景分析与展望:
           - 2.1 领域全景与技术路线: agentic-rl/ch2/2.1-landscape.md
           - 2.2 核心判断与未来预测: agentic-rl/ch2/2.2-outlook.md
+  - 更新日志: changelog.md
 
 markdown_extensions:
   - admonition

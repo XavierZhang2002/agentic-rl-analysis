@@ -5,11 +5,13 @@
 **A systematic survey of LLM post-training algorithms, industrial practices, and frontier directions.**
 
 [![Read Online](https://img.shields.io/badge/Read_Online-blue?style=for-the-badge&logo=materialformkdocs&logoColor=white)](https://XavierZhang2002.github.io/agentic-rl-analysis)
-[![Papers](https://img.shields.io/badge/50%2B_Papers-purple?style=for-the-badge&logo=arxiv&logoColor=white)](#)
-[![Models](https://img.shields.io/badge/12%2B_Models-teal?style=for-the-badge&logo=huggingface&logoColor=white)](#)
+[![Papers](https://img.shields.io/badge/70%2B_Papers-purple?style=for-the-badge&logo=arxiv&logoColor=white)](#)
+[![Models](https://img.shields.io/badge/16_Model_Reports-teal?style=for-the-badge&logo=huggingface&logoColor=white)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](#)
 
 [English](README.md) | [中文](README_zh.md)
+
+<sub>Last updated **2026-11** · 算法内容覆盖 PPO → SAPO（2025.11），模型内容覆盖至 2026.03 · 更新记录见 [CHANGELOG](docs/changelog.md)</sub>
 
 </div>
 
@@ -17,7 +19,7 @@
 
 ## Overview
 
-Two independent but complementary technical surveys covering 50+ papers and 12+ model technical reports (DeepSeek / Qwen / Kimi / GLM-5, etc.), systematically deconstructing core advances in LLM post-training from 2024–2026.
+Two independent but complementary technical surveys covering 70+ papers and 16 model technical reports (DeepSeek / Qwen / Kimi / GLM-5, etc.), systematically deconstructing core advances in LLM post-training from 2024–2026.
 
 ### Post-Training Technical Report
 
