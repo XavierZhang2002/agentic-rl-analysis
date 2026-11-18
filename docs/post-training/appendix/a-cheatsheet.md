@@ -1,10 +1,6 @@
 ---
 title: 附录 A 算法公式速查
 description: DPO / PPO / GRPO / DAPO / VAPO / CISPO / GSPO / SAPO / DPPO / TRM / LPO / OTB / SAO 十三个算法的核心式、机制一句话与出处，附五条选型速查。
-tags:
-  - 算法速查
-  - 公式对比
-  - 选型
 ---
 
 # 附录 A 算法公式速查

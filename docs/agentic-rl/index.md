@@ -1,10 +1,6 @@
 ---
 title: Agentic RL 调研报告
 description: 多轮交互、工具使用、长程规划场景的强化学习算法研究
-tags:
-  - Agentic RL
-  - 多轮交互
-  - 工具使用
 ---
 
 # Agentic RL 调研报告

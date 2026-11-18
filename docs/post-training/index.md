@@ -1,10 +1,6 @@
 ---
 title: Post-Training 技术报告
 description: 章节索引与内容覆盖范围。
-tags:
-  - Post-Training
-  - 导读
-  - RLVR
 ---
 
 # Post-Training 技术报告
