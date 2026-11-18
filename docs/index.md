@@ -11,10 +11,10 @@ tags:
 
 # LLM Post-Training 与 Agentic RL 研究
 
-<p class="byline">by <strong><a href="https://github.com/XavierZhang2002">zhenliang</a></strong> & <strong>opencode</strong> · 2026.03 初版 · 2026.11 校订 · 基于 70+ 篇论文与 16 份模型技术报告</p>
+<p class="byline">by <strong><a href="https://github.com/XavierZhang2002">zhenliang</a></strong> & <strong>opencode</strong> · 2026.03 初版 · 2026.11 重构 · 基于 100+ 篇论文与 18 个模型代</p>
 
 !!! note "内容覆盖"
-    算法部分覆盖 PPO → SAPO（2025.11），模型部分覆盖至 **2026.03**；2026 Q2–Q4 的模型与算法更新正在补充，详见 [更新日志](./changelog.md)。
+    **Post-Training 技术报告**覆盖至 2026 年 11 月（算法至 DPPO/TRM/LPO、模型至 DeepSeek-V4 / Kimi K3 / GLM-5.3 / MiniMax M3 / LongCat-2.5 / Qwen4-Max）；**Agentic RL 调研报告**覆盖至 2026 Q1。版本变化见 [更新日志](./changelog.md)。
 
 ---
 
@@ -24,11 +24,13 @@ tags:
 
     ---
 
-    从 PPO 到 SAPO 的算法演进，DeepSeek / Qwen / Kimi / GLM-5 等主流模型的训练实践，以及行业共识与个人思考。
+    六章一体：从训练范式到算法主线，再到训练经济学、数据环境、厂商档案与趋势判断。
 
-    - 7 种核心算法的公式推导与对比
-    - 6 大模型系列的 Post-Training 深度解读
-    - 6 大行业共识 · 5 大核心挑战 · 9 条个人观点
+    - 2 大范式 · 6 条流程范式
+    - 7 个算法的完整推导 + 信任域新解法
+    - 预算分配 / 稠密信号 / OPD 合并
+    - 数据与环境 · 基础设施 · 16 个失败模式
+    - 9 家厂商档案 · 6 条共识与 5 个挑战
 
     [:octicons-arrow-right-24: 开始阅读](./post-training/index.md){ .md-button }
 
@@ -56,22 +58,22 @@ tags:
 
     [:octicons-arrow-right-24: 训练全景与两大范式](./post-training/ch1/1.1-training-landscape.md)
 
-    [:octicons-arrow-right-24: 技术演进时间线](./post-training/ch3/3.1-timeline-paradigms.md)
+    [:octicons-arrow-right-24: 演进时间线与五代范式](./post-training/ch6/6.3-timeline-opinions.md)
 
 -   :material-chart-bar: **深入算法**
 
     ---
 
-    [:octicons-arrow-right-24: GRPO → SAPO 六大算法](./post-training/ch1/1.5-grpo.md)
+    [:octicons-arrow-right-24: 算法主线：PPO → SAPO](./post-training/ch2/2.1-ppo.md)
 
-    [:octicons-arrow-right-24: Agentic RL 算法](./agentic-rl/ch1/1.1-overview.md)
+    [:octicons-arrow-right-24: 信任域的新解法](./post-training/ch2/2.7-trust-region-2026.md)
 
 -   :material-office-building: **工业实践**
 
     ---
 
-    [:octicons-arrow-right-24: 跨模型训练经验](./post-training/ch2/2.8-cross-model.md)
+    [:octicons-arrow-right-24: 基础设施与一致性](./post-training/ch4/4.3-infra-consistency.md)
 
-    [:octicons-arrow-right-24: 行业共识与挑战](./post-training/ch3/3.2-challenges-future.md)
+    [:octicons-arrow-right-24: 厂商档案总览](./post-training/ch5/5.1-deepseek.md)
 
 </div>

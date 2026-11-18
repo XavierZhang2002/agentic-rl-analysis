@@ -50,49 +50,44 @@ extra:
 nav:
   - 首页: index.md
   - Post-Training 技术报告:
-      - 概述: post-training/index.md
-      - 1. 算法基础:
-          - 1.1 大模型训练全景: post-training/ch1/1.1-training-landscape.md
-          - 1.2 RLHF 与 RLVR 两大范式: post-training/ch1/1.2-rlhf-rlvr.md
-          - 1.3 DPO — 离线偏好优化: post-training/ch1/1.3-dpo.md
-          - 1.4 PPO — 经典策略优化: post-training/ch1/1.4-ppo.md
-          - 1.5 GRPO — RLVR 奠基算法: post-training/ch1/1.5-grpo.md
-          - 1.6 DAPO — 工业级优化: post-training/ch1/1.6-dapo.md
-          - 1.7 VAPO — Value 路线回归: post-training/ch1/1.7-vapo.md
-          - 1.8 CISPO — 序列级裁剪: post-training/ch1/1.8-cispo.md
-          - 1.9 GSPO — 序列级策略优化: post-training/ch1/1.9-gspo.md
-          - 1.10 SAPO — 平滑门控: post-training/ch1/1.10-sapo.md
-          - 1.11 算法公式速查表: post-training/ch1/1.11-cheatsheet.md
-          - 1.12 演进逻辑总结: post-training/ch1/1.12-evolution.md
-          - 2026 增补:
-              - 1.13 信任域与目标函数的新解法: post-training/ch1/1.13-trust-region-2026.md
-              - 1.14 预算分配与免 Critic 的稠密信号: post-training/ch1/1.14-budget-and-dense-signal.md
-              - 1.15 一致性与验证器: post-training/ch1/1.15-consistency-and-verifier.md
-              - 1.16 合并机制 OPD / MOPD: post-training/ch1/1.16-merging-opd-mopd.md
-      - 机制专题（2026 重构中）:
-          - 2.1 2026 技术报告全景: post-training/ch2/themes/01-overview-2026.md
-          - 2.2 训练流程范式: post-training/ch2/themes/02-pipeline-paradigms.md
-          - 2.3 奖励设计谱系: post-training/ch2/themes/03-reward-lineage.md
-          - 2.4 数据与环境工程: post-training/ch2/themes/04-data-and-environment.md
-          - 2.5 基础设施与一致性: post-training/ch2/themes/05-infra-consistency.md
-          - 2.6 失败模式清单: post-training/ch2/themes/06-failure-modes.md
-      - 2. 技术报告深度解读:
-          - 2.1 DeepSeek: post-training/ch2/2.1-deepseek.md
-          - 2.2 Kimi: post-training/ch2/2.2-kimi.md
-          - 2.3 Qwen: post-training/ch2/2.3-qwen.md
-          - 2.4 MiniMax: post-training/ch2/2.4-minimax.md
-          - 2.5 GLM-5: post-training/ch2/2.5-glm.md
-          - 2.6 Seed: post-training/ch2/2.6-seed.md
-          - 2.7 闭源模型概览: post-training/ch2/2.7-closed-source.md
-          - 2.8 跨模型训练经验: post-training/ch2/2.8-cross-model.md
-          - 2.9 数据工程专题: post-training/ch2/2.9-data-engineering.md
-          - 2.10 基座的 Agentic 能力是怎么训出来的: post-training/ch2/2.10-agentic-training.md
-          - 2.11 LongCat（美团）: post-training/ch2/2.11-longcat.md
-          - 2.12 Ling / Ring（蚂蚁）: post-training/ch2/2.12-ling-ring.md
-      - 3. 演进路线与趋势展望:
-          - 3.1 技术演进与范式变迁: post-training/ch3/3.1-timeline-paradigms.md
-          - 3.2 行业共识与核心挑战: post-training/ch3/3.2-challenges-future.md
-          - 3.3 个人分析与思考: post-training/ch3/3.3-opinions.md
+      - 导读: post-training/index.md
+      - 1. 基础：流程与范式:
+          - 1.1 训练全景: post-training/ch1/1.1-training-landscape.md
+          - 1.2 两大范式: post-training/ch1/1.2-paradigms.md
+          - 1.3 流程范式: post-training/ch1/1.3-pipeline-paradigms.md
+          - 1.4 奖励设计: post-training/ch1/1.4-reward-lineage.md
+      - 2. 算法主线:
+          - 2.1 PPO — 经典策略优化: post-training/ch2/2.1-ppo.md
+          - 2.2 GRPO — RLVR 的奠基: post-training/ch2/2.2-grpo.md
+          - 2.3 DAPO — 工业级工程优化: post-training/ch2/2.3-dapo.md
+          - 2.4 VAPO — Value 路线回归: post-training/ch2/2.4-vapo.md
+          - 2.5 CISPO 与 GSPO: post-training/ch2/2.5-cispo-gspo.md
+          - 2.6 SAPO — 软门控: post-training/ch2/2.6-sapo.md
+          - 2.7 信任域的新解法: post-training/ch2/2.7-trust-region-2026.md
+      - 3. 训练经济学:
+          - 3.1 预算分配: post-training/ch3/3.1-rollout-allocation.md
+          - 3.2 免 Critic 的稠密信号: post-training/ch3/3.2-dense-signal.md
+          - 3.3 合并机制：OPD / MOPD: post-training/ch3/3.3-merging-opd-mopd.md
+      - 4. 数据、环境与工程:
+          - 4.1 数据工程: post-training/ch4/4.1-data-engineering.md
+          - 4.2 环境工程: post-training/ch4/4.2-environment.md
+          - 4.3 基础设施与一致性: post-training/ch4/4.3-infra-consistency.md
+          - 4.4 验证器与失败模式: post-training/ch4/4.4-verifier-failures.md
+      - 5. 厂商档案:
+          - 5.1 DeepSeek: post-training/ch5/5.1-deepseek.md
+          - 5.2 Kimi: post-training/ch5/5.2-kimi.md
+          - 5.3 Qwen: post-training/ch5/5.3-qwen.md
+          - 5.4 MiniMax: post-training/ch5/5.4-minimax.md
+          - 5.5 GLM: post-training/ch5/5.5-glm.md
+          - 5.6 Seed: post-training/ch5/5.6-seed.md
+          - 5.7 LongCat（美团）: post-training/ch5/5.7-longcat.md
+          - 5.8 Ling / Ring（蚂蚁）: post-training/ch5/5.8-ling-ring.md
+          - 5.9 闭源模型: post-training/ch5/5.9-closed-source.md
+      - 6. 全景与趋势:
+          - 6.1 2026 技术报告全景: post-training/ch6/6.1-overview-2026.md
+          - 6.2 跨模型对比与共识: post-training/ch6/6.2-cross-model.md
+          - 6.3 时间线与个人判断: post-training/ch6/6.3-timeline-opinions.md
+      - 附录 A 算法公式速查: post-training/appendix/a-cheatsheet.md
   - Agentic RL 调研报告:
       - 概述: agentic-rl/index.md
       - 1. 算法与核心挑战:
